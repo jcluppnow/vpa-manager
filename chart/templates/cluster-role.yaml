@@ -1,0 +1,11 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}
+rules:
+  - apiGroups: [""]
+    resources: ["cronjobs", "deployments", "jobs", "namespaces", "pods"]
+    verbs: ["get", "list",  "watch"]
+  - apiGroups: ["autoscaling.k8s.io/v1"]
+    resources: ["verticalpodautoscalers"]
+    verbs: ["create", "delete", "get", "list"]
