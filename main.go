@@ -63,7 +63,7 @@ func createVPA(client dynamic.DynamicClient, sourceResourceType string, resource
 	}
 }
 
-func main() {
+func createListeners() {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		log.Fatalf("Error creating in-cluster config: %v", err)
@@ -114,6 +114,11 @@ func main() {
 	stopCh := make(chan struct{})
 	defer close(stopCh)
 	go informer.Run(stopCh)
+}
+
+func main() {
+	// Setup event listeners
+	createListeners()
 
 	// Wait forever
 	select {}
