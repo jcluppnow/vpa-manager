@@ -16,20 +16,32 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func createPodVPA(client dynamic.DynamicClient, podName string, targetNamespace string) {
-	// Create VPA template for a pod
-	pod := &unstructured.Unstructured{
+func createVPA(client dynamic.DynamicClient, sourceResourceType string, resourceName string, targetNamespace string) {
+	type ApiDetails struct {
+		version string
+		kind    string
+	}
+
+	apiDetails := map[string]ApiDetails{
+		"CronJob":    {"batch/v1", "CronJob"},
+		"Deployment": {"apps/v1", "Deployment"},
+		"Job":        {"batch/v1", "Job"},
+		"Pod":        {"v1", "Pod"},
+	}[sourceResourceType]
+
+	// Create VPA template for specified resource
+	vpaTemplate := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": "autoscaling.k8s.io/v1",
 			"kind":       "VerticalPodAutoscaler",
 			"metadata": map[string]interface{}{
-				"name": podName,
+				"name": resourceName,
 			},
 			"spec": map[string]interface{}{
 				"targetRef": map[string]interface{}{
-					"apiVersion": "v1",
-					"kind":       "Pod",
-					"name":       podName,
+					"apiVersion": apiDetails.version,
+					"kind":       apiDetails.kind,
+					"name":       resourceName,
 				},
 				"updatePolicy": map[string]interface{}{
 					"updateMode": "Off",
@@ -42,7 +54,7 @@ func createPodVPA(client dynamic.DynamicClient, podName string, targetNamespace 
 		Group:    "autoscaling.k8s.io",
 		Version:  "v1",
 		Resource: "verticalpodautoscalers",
-	}).Namespace(targetNamespace).Create(context.TODO(), pod, metav1.CreateOptions{})
+	}).Namespace(targetNamespace).Create(context.TODO(), vpaTemplate, metav1.CreateOptions{})
 
 	if err != nil {
 		log.Println("Error creating vpa resource", err)
@@ -87,7 +99,7 @@ func main() {
 		AddFunc: func(obj interface{}) {
 			pod := obj.(*v1.Pod)
 			fmt.Printf("Pod created: %s\n", pod.Name)
-			createPodVPA(*client, pod.Name, pod.Namespace)
+			createVPA(*client, "Pod", pod.Name, pod.Namespace)
 		},
 		// Optionally handle update and delete events
 		UpdateFunc: func(oldObj, newObj interface{}) {
