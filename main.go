@@ -2,15 +2,18 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
+	"time"
 
+	appsv1 "k8s.io/api/apps/v1" // Import for Deployments
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -57,9 +60,9 @@ func createVPA(client dynamic.DynamicClient, sourceResourceType string, resource
 	}).Namespace(targetNamespace).Create(context.TODO(), vpaTemplate, metav1.CreateOptions{})
 
 	if err != nil {
-		log.Println("Error creating vpa resource", err)
+		log.Println("Error creating vpa resource", err, sourceResourceType, resourceName, targetNamespace)
 	} else {
-		log.Println("Successfully created vpa resource")
+		log.Println("Successfully created vpa resource", sourceResourceType, resourceName, targetNamespace)
 	}
 }
 
@@ -75,7 +78,7 @@ func createListeners() {
 	}
 
 	// Create a pod informer
-	informer := cache.NewSharedInformer(
+	podInformer := cache.NewSharedInformer(
 		cache.NewListWatchFromClient(
 			clientset.CoreV1().RESTClient(),
 			"pods",
@@ -94,11 +97,28 @@ func createListeners() {
 		log.Println("Dynamic client created")
 	}
 
+	// Create a deployment informer
+	factory := informers.NewSharedInformerFactory(clientset, time.Minute)
+	deploymentInformer := factory.Apps().V1().Deployments().Informer()
+
+	deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			deployment := obj.(*appsv1.Deployment)
+			createVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
+		},
+		// Optionally handle update and delete events
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			// Handle pod update
+		},
+		DeleteFunc: func(obj interface{}) {
+			// Handle pod deletion
+		},
+	})
+
 	// Register event handlers
-	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+	podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			pod := obj.(*v1.Pod)
-			fmt.Printf("Pod created: %s\n", pod.Name)
 			createVPA(*client, "Pod", pod.Name, pod.Namespace)
 		},
 		// Optionally handle update and delete events
@@ -113,7 +133,10 @@ func createListeners() {
 	// Start the informer
 	stopCh := make(chan struct{})
 	defer close(stopCh)
-	go informer.Run(stopCh)
+	go podInformer.Run(stopCh)
+
+	factory.Start(wait.NeverStop)
+	factory.WaitForCacheSync(wait.NeverStop)
 }
 
 func main() {
