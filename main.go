@@ -5,7 +5,8 @@ import (
 	"log"
 	"time"
 
-	appsv1 "k8s.io/api/apps/v1" // Import for Deployments
+	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -87,12 +88,27 @@ func createListeners() {
 	// Create a deployment informer
 	factory := informers.NewSharedInformerFactory(clientset, time.Minute)
 	deploymentInformer := factory.Apps().V1().Deployments().Informer()
+	jobInformer := factory.Batch().V1().Jobs().Informer()
 	podInformer := factory.Core().V1().Pods().Informer()
 
 	deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			deployment := obj.(*appsv1.Deployment)
 			createVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
+		},
+		// Optionally handle update and delete events
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			// Handle pod update
+		},
+		DeleteFunc: func(obj interface{}) {
+			// Handle pod deletion
+		},
+	})
+
+	jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			job := obj.(*batchv1.Job)
+			createVPA(*client, "Job", job.Name, job.Namespace)
 		},
 		// Optionally handle update and delete events
 		UpdateFunc: func(oldObj, newObj interface{}) {
