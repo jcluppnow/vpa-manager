@@ -9,7 +9,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
@@ -77,18 +76,6 @@ func createListeners() {
 		log.Fatalf("Error creating Kubernetes client: %v", err)
 	}
 
-	// Create a pod informer
-	podInformer := cache.NewSharedInformer(
-		cache.NewListWatchFromClient(
-			clientset.CoreV1().RESTClient(),
-			"pods",
-			metav1.NamespaceAll,
-			fields.Everything(),
-		),
-		&v1.Pod{},
-		0, // No resync period
-	)
-
 	// Create dynamic client to deal with VPA CRD
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
@@ -100,6 +87,7 @@ func createListeners() {
 	// Create a deployment informer
 	factory := informers.NewSharedInformerFactory(clientset, time.Minute)
 	deploymentInformer := factory.Apps().V1().Deployments().Informer()
+	podInformer := factory.Core().V1().Pods().Informer()
 
 	deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
@@ -131,11 +119,6 @@ func createListeners() {
 			// Handle pod deletion
 		},
 	})
-
-	// Start the informer
-	stopCh := make(chan struct{})
-	defer close(stopCh)
-	go podInformer.Run(stopCh)
 
 	factory.Start(wait.NeverStop)
 	factory.WaitForCacheSync(wait.NeverStop)
