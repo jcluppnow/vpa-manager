@@ -123,7 +123,10 @@ func createListeners() {
 	jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			job := obj.(*batchv1.Job)
-			createVPA(*client, "Job", job.Name, job.Namespace)
+
+			if len(job.OwnerReferences) == 0 {
+				createVPA(*client, "Job", job.Name, job.Namespace)
+			}
 		},
 		// Optionally handle update and delete events
 		UpdateFunc: func(oldObj, newObj interface{}) {
@@ -138,6 +141,7 @@ func createListeners() {
 	podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			pod := obj.(*v1.Pod)
+
 			if len(pod.OwnerReferences) == 0 {
 				createVPA(*client, "Pod", pod.Name, pod.Namespace)
 			}
