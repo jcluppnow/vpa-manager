@@ -4,7 +4,13 @@ metadata:
   name: {{ .Release.Name }}
 rules:
   - apiGroups: [""]
-    resources: ["cronjobs", "deployments", "jobs", "namespaces", "pods"]
+    resources: ["namespaces", "pods"]
+    verbs: ["get", "list",  "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list",  "watch"]
+  - apiGroups: ["batch"]
+    resources: ["cronjobs", "jobs"]
     verbs: ["get", "list",  "watch"]
   - apiGroups: ["autoscaling.k8s.io"]
     resources: ["verticalpodautoscalers"]
