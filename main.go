@@ -87,9 +87,24 @@ func createListeners() {
 
 	// Create a deployment informer
 	factory := informers.NewSharedInformerFactory(clientset, time.Minute)
+	cronJobInformer := factory.Batch().V1().CronJobs().Informer()
 	deploymentInformer := factory.Apps().V1().Deployments().Informer()
 	jobInformer := factory.Batch().V1().Jobs().Informer()
 	podInformer := factory.Core().V1().Pods().Informer()
+
+	cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc: func(obj interface{}) {
+			cronJob := obj.(*batchv1.CronJob)
+			createVPA(*client, "CronJob", cronJob.Name, cronJob.Namespace)
+		},
+		// Optionally handle update and delete events
+		UpdateFunc: func(oldObj, newObj interface{}) {
+			// Handle pod update
+		},
+		DeleteFunc: func(obj interface{}) {
+			// Handle pod deletion
+		},
+	})
 
 	deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
