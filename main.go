@@ -119,7 +119,9 @@ func createListeners() {
 	podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			pod := obj.(*v1.Pod)
-			createVPA(*client, "Pod", pod.Name, pod.Namespace)
+			if len(pod.OwnerReferences) == 0 {
+				createVPA(*client, "Pod", pod.Name, pod.Namespace)
+			}
 		},
 		// Optionally handle update and delete events
 		UpdateFunc: func(oldObj, newObj interface{}) {
