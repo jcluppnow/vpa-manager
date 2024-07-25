@@ -97,10 +97,6 @@ func createListeners() {
 			cronJob := obj.(*batchv1.CronJob)
 			createVPA(*client, "CronJob", cronJob.Name, cronJob.Namespace)
 		},
-		// Optionally handle update and delete events
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			// Handle pod update
-		},
 		DeleteFunc: func(obj interface{}) {
 			// Handle pod deletion
 		},
@@ -110,10 +106,6 @@ func createListeners() {
 		AddFunc: func(obj interface{}) {
 			deployment := obj.(*appsv1.Deployment)
 			createVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
-		},
-		// Optionally handle update and delete events
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			// Handle pod update
 		},
 		DeleteFunc: func(obj interface{}) {
 			// Handle pod deletion
@@ -128,10 +120,6 @@ func createListeners() {
 				createVPA(*client, "Job", job.Name, job.Namespace)
 			}
 		},
-		// Optionally handle update and delete events
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			// Handle pod update
-		},
 		DeleteFunc: func(obj interface{}) {
 			// Handle pod deletion
 		},
@@ -145,10 +133,6 @@ func createListeners() {
 			if len(pod.OwnerReferences) == 0 {
 				createVPA(*client, "Pod", pod.Name, pod.Namespace)
 			}
-		},
-		// Optionally handle update and delete events
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			// Handle pod update
 		},
 		DeleteFunc: func(obj interface{}) {
 			// Handle pod deletion
