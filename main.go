@@ -60,7 +60,7 @@ func createVPA(client dynamic.DynamicClient, sourceResourceType string, resource
 	}).Namespace(targetNamespace).Get(context.TODO(), resourceName, metav1.GetOptions{})
 
 	if getErr == nil {
-		log.Println("Skipping creating vpa resource due either due to conflicting name or the VPA already exists", sourceResourceType, resourceName, targetNamespace)
+		log.Println("Skipping creating VPA resource as it already exists for this resource type", sourceResourceType, resourceName, targetNamespace)
 	} else {
 		_, err := client.Resource(schema.GroupVersionResource{
 			Group:    "autoscaling.k8s.io",
