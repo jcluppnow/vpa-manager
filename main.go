@@ -109,72 +109,72 @@ func createListeners(targetNamespaces []string) {
 		log.Fatalf("Error creating dynamic client: %v", err)
 	}
 
-	// Create a deployment informer
-	factory := informers.NewSharedInformerFactory(clientset, time.Minute)
-	cronJobInformer := factory.Batch().V1().CronJobs().Informer()
-	deploymentInformer := factory.Apps().V1().Deployments().Informer()
-	jobInformer := factory.Batch().V1().Jobs().Informer()
-	podInformer := factory.Core().V1().Pods().Informer()
+	if len(targetNamespaces) == 0 {
+		factory := informers.NewSharedInformerFactory(clientset, time.Minute)
+		cronJobInformer := factory.Batch().V1().CronJobs().Informer()
+		deploymentInformer := factory.Apps().V1().Deployments().Informer()
+		jobInformer := factory.Batch().V1().Jobs().Informer()
+		podInformer := factory.Core().V1().Pods().Informer()
 
-	cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			cronJob := obj.(*batchv1.CronJob)
-			createVPA(*client, "CronJob", cronJob.Name, cronJob.Namespace)
-		},
-		DeleteFunc: func(obj interface{}) {
-			cronJob := obj.(*batchv1.CronJob)
-			deleteVPA(*client, cronJob.Name, cronJob.Namespace)
-		},
-	})
+		cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				cronJob := obj.(*batchv1.CronJob)
+				createVPA(*client, "CronJob", cronJob.Name, cronJob.Namespace)
+			},
+			DeleteFunc: func(obj interface{}) {
+				cronJob := obj.(*batchv1.CronJob)
+				deleteVPA(*client, cronJob.Name, cronJob.Namespace)
+			},
+		})
 
-	deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			deployment := obj.(*appsv1.Deployment)
-			createVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
-		},
-		DeleteFunc: func(obj interface{}) {
-			deployment := obj.(*batchv1.CronJob)
-			deleteVPA(*client, deployment.Name, deployment.Namespace)
-		},
-	})
+		deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				deployment := obj.(*appsv1.Deployment)
+				createVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
+			},
+			DeleteFunc: func(obj interface{}) {
+				deployment := obj.(*batchv1.CronJob)
+				deleteVPA(*client, deployment.Name, deployment.Namespace)
+			},
+		})
 
-	jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			job := obj.(*batchv1.Job)
+		jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				job := obj.(*batchv1.Job)
 
-			if len(job.OwnerReferences) == 0 {
-				createVPA(*client, "Job", job.Name, job.Namespace)
-			}
-		},
-		DeleteFunc: func(obj interface{}) {
-			job := obj.(*batchv1.Job)
+				if len(job.OwnerReferences) == 0 {
+					createVPA(*client, "Job", job.Name, job.Namespace)
+				}
+			},
+			DeleteFunc: func(obj interface{}) {
+				job := obj.(*batchv1.Job)
 
-			if len(job.OwnerReferences) == 0 {
-				deleteVPA(*client, job.Name, job.Namespace)
-			}
-		},
-	})
+				if len(job.OwnerReferences) == 0 {
+					deleteVPA(*client, job.Name, job.Namespace)
+				}
+			},
+		})
 
-	// Register event handlers
-	podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc: func(obj interface{}) {
-			pod := obj.(*v1.Pod)
+		podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+			AddFunc: func(obj interface{}) {
+				pod := obj.(*v1.Pod)
 
-			if len(pod.OwnerReferences) == 0 {
-				createVPA(*client, "Pod", pod.Name, pod.Namespace)
-			}
-		},
-		DeleteFunc: func(obj interface{}) {
-			pod := obj.(*v1.Pod)
+				if len(pod.OwnerReferences) == 0 {
+					createVPA(*client, "Pod", pod.Name, pod.Namespace)
+				}
+			},
+			DeleteFunc: func(obj interface{}) {
+				pod := obj.(*v1.Pod)
 
-			if len(pod.OwnerReferences) == 0 {
-				deleteVPA(*client, pod.Name, pod.Namespace)
-			}
-		},
-	})
+				if len(pod.OwnerReferences) == 0 {
+					deleteVPA(*client, pod.Name, pod.Namespace)
+				}
+			},
+		})
 
-	factory.Start(wait.NeverStop)
-	factory.WaitForCacheSync(wait.NeverStop)
+		factory.Start(wait.NeverStop)
+		factory.WaitForCacheSync(wait.NeverStop)
+	}
 }
 
 func main() {
