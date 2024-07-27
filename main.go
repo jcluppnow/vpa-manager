@@ -66,6 +66,20 @@ func createVPA(client dynamic.DynamicClient, sourceResourceType string, resource
 	}
 }
 
+func deleteVPA(client dynamic.DynamicClient, resourceName string, targetNamespace string) {
+	err := client.Resource(schema.GroupVersionResource{
+		Group:    "autoscaling.k8s.io",
+		Version:  "v1",
+		Resource: "verticalpodautoscalers",
+	}).Namespace(targetNamespace).Delete(context.TODO(), resourceName, metav1.DeleteOptions{})
+
+	if err != nil {
+		log.Println("Error deleting vpa resource", err, resourceName, targetNamespace)
+	} else {
+		log.Println("Successfully deleted vpa resource", resourceName, targetNamespace)
+	}
+}
+
 func createListeners() {
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -81,8 +95,6 @@ func createListeners() {
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
 		log.Fatalf("Error creating dynamic client: %v", err)
-	} else {
-		log.Println("Dynamic client created")
 	}
 
 	// Create a deployment informer
@@ -97,12 +109,9 @@ func createListeners() {
 			cronJob := obj.(*batchv1.CronJob)
 			createVPA(*client, "CronJob", cronJob.Name, cronJob.Namespace)
 		},
-		// Optionally handle update and delete events
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			// Handle pod update
-		},
 		DeleteFunc: func(obj interface{}) {
-			// Handle pod deletion
+			cronJob := obj.(*batchv1.CronJob)
+			deleteVPA(*client, cronJob.Name, cronJob.Namespace)
 		},
 	})
 
@@ -111,12 +120,9 @@ func createListeners() {
 			deployment := obj.(*appsv1.Deployment)
 			createVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
 		},
-		// Optionally handle update and delete events
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			// Handle pod update
-		},
 		DeleteFunc: func(obj interface{}) {
-			// Handle pod deletion
+			deployment := obj.(*batchv1.CronJob)
+			deleteVPA(*client, deployment.Name, deployment.Namespace)
 		},
 	})
 
@@ -128,12 +134,12 @@ func createListeners() {
 				createVPA(*client, "Job", job.Name, job.Namespace)
 			}
 		},
-		// Optionally handle update and delete events
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			// Handle pod update
-		},
 		DeleteFunc: func(obj interface{}) {
-			// Handle pod deletion
+			job := obj.(*batchv1.Job)
+
+			if len(job.OwnerReferences) == 0 {
+				deleteVPA(*client, job.Name, job.Namespace)
+			}
 		},
 	})
 
@@ -146,12 +152,12 @@ func createListeners() {
 				createVPA(*client, "Pod", pod.Name, pod.Namespace)
 			}
 		},
-		// Optionally handle update and delete events
-		UpdateFunc: func(oldObj, newObj interface{}) {
-			// Handle pod update
-		},
 		DeleteFunc: func(obj interface{}) {
-			// Handle pod deletion
+			pod := obj.(*v1.Pod)
+
+			if len(pod.OwnerReferences) == 0 {
+				deleteVPA(*client, pod.Name, pod.Namespace)
+			}
 		},
 	})
 
