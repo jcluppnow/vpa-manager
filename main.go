@@ -95,8 +95,6 @@ func createListeners() {
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
 		log.Fatalf("Error creating dynamic client: %v", err)
-	} else {
-		log.Println("Dynamic client created")
 	}
 
 	// Create a deployment informer
