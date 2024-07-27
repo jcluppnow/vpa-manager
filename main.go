@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -90,7 +92,7 @@ func deleteVPA(client dynamic.DynamicClient, resourceName string, targetNamespac
 	}
 }
 
-func createListeners() {
+func createListeners(targetNamespaces []string) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		log.Fatalf("Error creating in-cluster config: %v", err)
@@ -176,8 +178,15 @@ func createListeners() {
 }
 
 func main() {
+	targetNamespaces := os.Getenv("TARGET_NAMESPACES")
+	formattedNamespaces := []string{}
+
+	if targetNamespaces != "" {
+		formattedNamespaces = strings.Split(targetNamespaces, ",")
+	}
+
 	// Setup event listeners
-	createListeners()
+	createListeners(formattedNamespaces)
 
 	// Wait forever
 	select {}
