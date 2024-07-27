@@ -15,6 +15,9 @@ spec:
     spec:
       containers:
         - name: vpa-manager
+          env:
+            - name: TARGET_NAMESPACES
+              value: '{{ .Values.targetNamespaces | join "," }}'
           image: vpa-manager:latest
           imagePullPolicy: IfNotPresent
       serviceAccountName: {{ .Release.Name }}
