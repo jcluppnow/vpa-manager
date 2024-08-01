@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -90,7 +92,21 @@ func deleteVPA(client dynamic.DynamicClient, resourceName string, targetNamespac
 	}
 }
 
-func createListeners() {
+func isTargetNamespace(targetNamespaces []string, namespace string) bool {
+	if len(targetNamespaces) == 0 {
+		return true
+	}
+
+	for index := range targetNamespaces {
+		if targetNamespaces[index] == namespace {
+			return true
+		}
+	}
+
+	return false
+}
+
+func createListeners(targetNamespaces []string) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		log.Fatalf("Error creating in-cluster config: %v", err)
@@ -101,13 +117,11 @@ func createListeners() {
 		log.Fatalf("Error creating Kubernetes client: %v", err)
 	}
 
-	// Create dynamic client to deal with VPA CRD
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
 		log.Fatalf("Error creating dynamic client: %v", err)
 	}
 
-	// Create a deployment informer
 	factory := informers.NewSharedInformerFactory(clientset, time.Minute)
 	cronJobInformer := factory.Batch().V1().CronJobs().Informer()
 	deploymentInformer := factory.Apps().V1().Deployments().Informer()
@@ -117,55 +131,58 @@ func createListeners() {
 	cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			cronJob := obj.(*batchv1.CronJob)
-			createVPA(*client, "CronJob", cronJob.Name, cronJob.Namespace)
+			if isTargetNamespace(targetNamespaces, cronJob.Namespace) {
+				createVPA(*client, "CronJob", cronJob.Name, cronJob.Namespace)
+			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			cronJob := obj.(*batchv1.CronJob)
-			deleteVPA(*client, cronJob.Name, cronJob.Namespace)
+			if isTargetNamespace(targetNamespaces, cronJob.Namespace) {
+				deleteVPA(*client, cronJob.Name, cronJob.Namespace)
+			}
 		},
 	})
 
 	deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			deployment := obj.(*appsv1.Deployment)
-			createVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
+			if isTargetNamespace(targetNamespaces, deployment.Namespace) {
+				createVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
+			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			deployment := obj.(*batchv1.CronJob)
-			deleteVPA(*client, deployment.Name, deployment.Namespace)
+			if isTargetNamespace(targetNamespaces, deployment.Namespace) {
+				deleteVPA(*client, deployment.Name, deployment.Namespace)
+			}
 		},
 	})
 
 	jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			job := obj.(*batchv1.Job)
-
-			if len(job.OwnerReferences) == 0 {
+			if len(job.OwnerReferences) == 0 && isTargetNamespace(targetNamespaces, job.Namespace) {
 				createVPA(*client, "Job", job.Name, job.Namespace)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			job := obj.(*batchv1.Job)
-
-			if len(job.OwnerReferences) == 0 {
+			if len(job.OwnerReferences) == 0 && isTargetNamespace(targetNamespaces, job.Namespace) {
 				deleteVPA(*client, job.Name, job.Namespace)
 			}
 		},
 	})
 
-	// Register event handlers
 	podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			pod := obj.(*v1.Pod)
-
-			if len(pod.OwnerReferences) == 0 {
+			if len(pod.OwnerReferences) == 0 && isTargetNamespace(targetNamespaces, pod.Namespace) {
 				createVPA(*client, "Pod", pod.Name, pod.Namespace)
 			}
 		},
 		DeleteFunc: func(obj interface{}) {
 			pod := obj.(*v1.Pod)
-
-			if len(pod.OwnerReferences) == 0 {
+			if len(pod.OwnerReferences) == 0 && isTargetNamespace(targetNamespaces, pod.Namespace) {
 				deleteVPA(*client, pod.Name, pod.Namespace)
 			}
 		},
@@ -176,8 +193,15 @@ func createListeners() {
 }
 
 func main() {
+	targetNamespaces := os.Getenv("TARGET_NAMESPACES")
+	formattedNamespaces := []string{}
+
+	if targetNamespaces != "" {
+		formattedNamespaces = strings.Split(targetNamespaces, ",")
+	}
+
 	// Setup event listeners
-	createListeners()
+	createListeners(formattedNamespaces)
 
 	// Wait forever
 	select {}
