@@ -117,7 +117,6 @@ func createListeners(targetNamespaces []string) {
 		log.Fatalf("Error creating Kubernetes client: %v", err)
 	}
 
-	// Create dynamic client to deal with VPA CRD
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
 		log.Fatalf("Error creating dynamic client: %v", err)
