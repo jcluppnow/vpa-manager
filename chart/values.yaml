@@ -8,6 +8,8 @@ podAnnotations: {}
 ## Assign a PriorityClassName to pods if set
 # priorityClassName: ""
 
+resources: {}
+
 serviceAccount:
   annotations: {}
 
