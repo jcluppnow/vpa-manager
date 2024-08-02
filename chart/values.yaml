@@ -1,7 +1,15 @@
+## Affinity settings for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+affinity: {}
+
 annotations: {}
 
 image: "vpa-manager:latest"
 imagePullPolicy: IfNotPresent
+
+## Node labels for pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
 
 podAnnotations: {}
 
@@ -14,3 +22,7 @@ serviceAccount:
   annotations: {}
 
 targetNamespaces: []
+
+## Tolerations for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
