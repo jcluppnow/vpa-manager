@@ -3,22 +3,51 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vpa-manager.labels" . | indent 4 }}
+  {{- if .Values.annotations }}
+  annotations:
+    {{ toYaml .Values.annotations | indent 8 }}
+  {{- end }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      {{- include "vpa-manager.labels" . | indent 6 }}
+  {{- if .Values.revisionHistoryLimit }} 
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  {{- end }}
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        {{- include "vpa-manager.labels" . | indent 8 }}
+      {{- if .Values.podAnnotations }}
+      annotations:
+        {{ toYaml .Values.podAnnotations | indent 8 }}
+      {{- end }}
     spec:
       containers:
         - name: vpa-manager
           env:
             - name: TARGET_NAMESPACES
-              value: '{{ .Values.targetNamespaces | join "," }}'
-          image: vpa-manager:latest
-          imagePullPolicy: IfNotPresent
+              value: '{{ .Values.targetNamespaces | default (list) | join "," }}'
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
       serviceAccountName: {{ .Release.Name }}
-
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+        {{ toYaml .Values.affinity | indent 8 }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml .Values.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations:
+        {{ toYaml .Values.tolerations | indent 8 }}
+      {{- end }}

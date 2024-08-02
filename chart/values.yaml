@@ -1,1 +1,34 @@
+## Affinity settings for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+affinity: {}
+
+annotations: {}
+
+image:
+  pullPolicy: IfNotPresent
+  repository: "vpa-manager"
+  tag: "latest" 
+
+## Node labels for pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+podAnnotations: {}
+
+## Assign a PriorityClassName to pods if set
+# priorityClassName: ""
+
+resources: {}
+
+# Number of old history to retain to allow rollback
+# Default Kubernetes value is set to 10
+revisionHistoryLimit: 10
+
+serviceAccount:
+  annotations: {}
+
 targetNamespaces: []
+
+## Tolerations for pod assignment
+## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+tolerations: []
