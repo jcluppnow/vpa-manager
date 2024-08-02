@@ -20,6 +20,6 @@ spec:
           env:
             - name: TARGET_NAMESPACES
               value: '{{ .Values.targetNamespaces | default (list) | join "," }}'
-          image: vpa-manager:latest
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: {{ .Values.imagePullPolicy }}
+          image: {{ .Values.image }}
       serviceAccountName: {{ .Release.Name }}
