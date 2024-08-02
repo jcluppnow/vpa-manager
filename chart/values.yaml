@@ -5,6 +5,9 @@ imagePullPolicy: IfNotPresent
 
 podAnnotations: {}
 
+## Assign a PriorityClassName to pods if set
+# priorityClassName: ""
+
 serviceAccount:
   annotations: {}
 

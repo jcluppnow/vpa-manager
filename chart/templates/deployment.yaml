@@ -31,3 +31,6 @@ spec:
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           image: {{ .Values.image }}
       serviceAccountName: {{ .Release.Name }}
+      {{- if .Values.priorityClassName }}
+      priorityClassName: {{ .Values.priorityClassName }}
+      {{- end }}
