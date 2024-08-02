@@ -3,15 +3,17 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vpa-manager.labels" . | indent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      {{- include "vpa-manager.labels" . | indent 6 }}
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        {{- include "vpa-manager.labels" . | indent 8 }}
     spec:
       containers:
         - name: vpa-manager
@@ -21,4 +23,3 @@ spec:
           image: vpa-manager:latest
           imagePullPolicy: IfNotPresent
       serviceAccountName: {{ .Release.Name }}
-
