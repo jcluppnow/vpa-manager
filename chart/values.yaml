@@ -4,8 +4,10 @@ affinity: {}
 
 annotations: {}
 
-image: "vpa-manager:latest"
-imagePullPolicy: IfNotPresent
+image:
+  pullPolicy: IfNotPresent
+  repository: "vpa-manager"
+  tag: "latest" 
 
 ## Node labels for pod assignment
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
