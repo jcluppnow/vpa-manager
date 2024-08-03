@@ -30,6 +30,10 @@ func isTargetNamespace(targetNamespaces []string, namespace string) bool {
 }
 
 func CreateInformers(targetNamespaces []string, resourcesToManage ResourcesToManage) {
+	if !resourcesToManage.Cronjobs && !resourcesToManage.Deployments && !resourcesToManage.Jobs && !resourcesToManage.Pods {
+		log.Print("All resources types are disabled, as a result no Vertical Pod Autoscalers will be created. If this is not expected, review your configuration")
+	}
+
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		log.Fatalf("Error creating in-cluster config: %v", err)
