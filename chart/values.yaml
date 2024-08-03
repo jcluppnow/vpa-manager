@@ -27,6 +27,8 @@ revisionHistoryLimit: 10
 serviceAccount:
   annotations: {}
 
+# List of namespaces to create Vertical Pod Autoscaler resources for
+# Leaving this empty will create VPA resources for all namespaces
 targetNamespaces: []
 
 ## Tolerations for pod assignment
