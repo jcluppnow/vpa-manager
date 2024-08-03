@@ -4,6 +4,7 @@ import (
 	"os"
 	"strings"
 	"vpa-manager/controller"
+	"vpa-manager/controller/utils"
 )
 
 func main() {
@@ -14,8 +15,15 @@ func main() {
 		formattedNamespaces = strings.Split(targetNamespaces, ",")
 	}
 
+	resourcesToManage := controller.ResourcesToManage{
+		Cronjobs:    utils.ParseBoolFromEnv("ENABLE_CRONJOBS"),
+		Deployments: utils.ParseBoolFromEnv("ENABLE_DEPLOYMENTS"),
+		Jobs:        utils.ParseBoolFromEnv("ENABLE_JOBS"),
+		Pods:        utils.ParseBoolFromEnv("ENABLE_PODS"),
+	}
+
 	// Setup event listeners
-	controller.CreateInformers(formattedNamespaces)
+	controller.CreateInformers(formattedNamespaces, resourcesToManage)
 
 	// Wait forever
 	select {}
