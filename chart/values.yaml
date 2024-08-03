@@ -23,7 +23,7 @@ resources: {}
 # Configuration for what resources to create Vertical Pod autoscalers for
 # Setting the configuration option to False will ignore the resource type completely
 resourcesToManage:
-  cronjobs: "test"
+  cronjobs: "True"
   deployments: "True"
   jobs: "True"
   pods: "True"
