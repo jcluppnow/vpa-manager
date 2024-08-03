@@ -22,9 +22,6 @@ func main() {
 		Pods:        utils.ParseBoolFromEnv("ENABLE_PODS"),
 	}
 
-	// Setup event listeners
 	controller.CreateInformers(formattedNamespaces, resourcesToManage)
-
-	// Wait forever
 	select {}
 }
