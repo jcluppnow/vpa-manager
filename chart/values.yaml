@@ -20,6 +20,14 @@ podAnnotations: {}
 
 resources: {}
 
+# Configuration for what resources to create Vertical Pod autoscalers for
+# Setting the configuration option to False will ignore the resource type completely
+resourcesToManage:
+  cronjobs: "test"
+  deployments: "True"
+  jobs: "True"
+  pods: "True"
+
 # Number of old history to retain to allow rollback
 # Default Kubernetes value is set to 10
 revisionHistoryLimit: 10
@@ -30,6 +38,7 @@ serviceAccount:
 # List of namespaces to create Vertical Pod Autoscaler resources for
 # Leaving this empty will create VPA resources for all namespaces
 targetNamespaces: []
+
 
 ## Tolerations for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
