@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"strings"
+	"vpa-manager/controller"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 	}
 
 	// Setup event listeners
-	createListeners(formattedNamespaces)
+	controller.CreateInformers(formattedNamespaces)
 
 	// Wait forever
 	select {}
