@@ -23,7 +23,6 @@ func CreateVPA(client dynamic.DynamicClient, sourceResourceType string, resource
 		"Pod":        {"v1", "Pod"},
 	}[sourceResourceType]
 
-	// Create VPA template for specified resource
 	vpaTemplate := &unstructured.Unstructured{
 		Object: map[string]interface{}{
 			"apiVersion": "autoscaling.k8s.io/v1",
