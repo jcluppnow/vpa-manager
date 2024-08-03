@@ -31,6 +31,10 @@ spec:
           env:
             - name: TARGET_NAMESPACES
               value: '{{ .Values.targetNamespaces | default (list) | join "," }}'
+            {{- range $name, $value := .Values.resourcesToManage }}
+            - name: ENABLE_{{ $name | upper }}
+              value: {{ $value | quote }}
+            {{- end }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
           resources:
