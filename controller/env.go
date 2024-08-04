@@ -7,11 +7,11 @@ import (
 )
 
 type ControllerEnv struct {
-	Cronjobs         bool
-	Deployments      bool
-	Jobs             bool
-	Pods             bool
-	TargetNamespaces []string
+	EnableCronjobs    bool
+	EnableDeployments bool
+	EnableJobs        bool
+	EnablePods        bool
+	TargetNamespaces  []string
 }
 
 func LoadEnv() ControllerEnv {
@@ -23,11 +23,11 @@ func LoadEnv() ControllerEnv {
 	}
 
 	env := ControllerEnv{
-		Cronjobs:         utils.ParseBoolFromEnv("ENABLE_CRONJOBS"),
-		Deployments:      utils.ParseBoolFromEnv("ENABLE_DEPLOYMENTS"),
-		Jobs:             utils.ParseBoolFromEnv("ENABLE_JOBS"),
-		Pods:             utils.ParseBoolFromEnv("ENABLE_PODS"),
-		TargetNamespaces: formattedNamespaces,
+		EnableCronjobs:    utils.ParseBoolFromEnv("ENABLE_CRONJOBS"),
+		EnableDeployments: utils.ParseBoolFromEnv("ENABLE_DEPLOYMENTS"),
+		EnableJobs:        utils.ParseBoolFromEnv("ENABLE_JOBS"),
+		EnablePods:        utils.ParseBoolFromEnv("ENABLE_PODS"),
+		TargetNamespaces:  formattedNamespaces,
 	}
 
 	return env

@@ -30,7 +30,7 @@ func isTargetNamespace(targetNamespaces []string, namespace string) bool {
 }
 
 func CreateInformers(env ControllerEnv) {
-	if !env.Cronjobs && !env.Deployments && !env.Jobs && !env.Pods {
+	if !env.EnableCronjobs && !env.EnableDeployments && !env.EnableJobs && !env.EnablePods {
 		log.Print("All resources types are disabled, as a result no Vertical Pod Autoscalers will be created. If this is not expected, review your configuration")
 	}
 
@@ -54,7 +54,7 @@ func CreateInformers(env ControllerEnv) {
 	jobInformer := factory.Batch().V1().Jobs().Informer()
 	podInformer := factory.Core().V1().Pods().Informer()
 
-	if env.Cronjobs {
+	if env.EnableCronjobs {
 		cronJobInformer := factory.Batch().V1().CronJobs().Informer()
 		cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
@@ -72,7 +72,7 @@ func CreateInformers(env ControllerEnv) {
 		})
 	}
 
-	if env.Deployments {
+	if env.EnableDeployments {
 		deploymentInformer := factory.Apps().V1().Deployments().Informer()
 		deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
@@ -90,7 +90,7 @@ func CreateInformers(env ControllerEnv) {
 		})
 	}
 
-	if env.Jobs {
+	if env.EnableJobs {
 		jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
@@ -107,7 +107,7 @@ func CreateInformers(env ControllerEnv) {
 		})
 	}
 
-	if env.Pods {
+	if env.EnablePods {
 		podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
