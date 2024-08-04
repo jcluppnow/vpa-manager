@@ -20,7 +20,7 @@ podAnnotations: {}
 ## Assign a PriorityClassName to pods if set
 # priorityClassName: ""
 
-## Define the resources the vpa container needs
+## Define the resources the controller container needs
 ## These are not set by default as the controller will create a VPA for itself
 resources: {}
 
