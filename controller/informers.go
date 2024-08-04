@@ -29,8 +29,8 @@ func isTargetNamespace(targetNamespaces []string, namespace string) bool {
 	return false
 }
 
-func CreateInformers(targetNamespaces []string, resourcesToManage ResourcesToManage) {
-	if !resourcesToManage.Cronjobs && !resourcesToManage.Deployments && !resourcesToManage.Jobs && !resourcesToManage.Pods {
+func CreateInformers(env ControllerEnv) {
+	if !env.Cronjobs && !env.Deployments && !env.Jobs && !env.Pods {
 		log.Print("All resources types are disabled, as a result no Vertical Pod Autoscalers will be created. If this is not expected, review your configuration")
 	}
 
@@ -54,70 +54,70 @@ func CreateInformers(targetNamespaces []string, resourcesToManage ResourcesToMan
 	jobInformer := factory.Batch().V1().Jobs().Informer()
 	podInformer := factory.Core().V1().Pods().Informer()
 
-	if resourcesToManage.Cronjobs {
+	if env.Cronjobs {
 		cronJobInformer := factory.Batch().V1().CronJobs().Informer()
 		cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				cronJob := obj.(*batchv1.CronJob)
-				if isTargetNamespace(targetNamespaces, cronJob.Namespace) {
+				if isTargetNamespace(env.TargetNamespaces, cronJob.Namespace) {
 					CreateVPA(*client, "CronJob", cronJob.Name, cronJob.Namespace)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				cronJob := obj.(*batchv1.CronJob)
-				if isTargetNamespace(targetNamespaces, cronJob.Namespace) {
+				if isTargetNamespace(env.TargetNamespaces, cronJob.Namespace) {
 					DeleteVPA(*client, cronJob.Name, cronJob.Namespace)
 				}
 			},
 		})
 	}
 
-	if resourcesToManage.Deployments {
+	if env.Deployments {
 		deploymentInformer := factory.Apps().V1().Deployments().Informer()
 		deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				deployment := obj.(*appsv1.Deployment)
-				if isTargetNamespace(targetNamespaces, deployment.Namespace) {
+				if isTargetNamespace(env.TargetNamespaces, deployment.Namespace) {
 					CreateVPA(*client, "Deployment", deployment.Name, deployment.Namespace)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				deployment := obj.(*batchv1.CronJob)
-				if isTargetNamespace(targetNamespaces, deployment.Namespace) {
+				if isTargetNamespace(env.TargetNamespaces, deployment.Namespace) {
 					DeleteVPA(*client, deployment.Name, deployment.Namespace)
 				}
 			},
 		})
 	}
 
-	if resourcesToManage.Jobs {
+	if env.Jobs {
 		jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
-				if len(job.OwnerReferences) == 0 && isTargetNamespace(targetNamespaces, job.Namespace) {
+				if len(job.OwnerReferences) == 0 && isTargetNamespace(env.TargetNamespaces, job.Namespace) {
 					CreateVPA(*client, "Job", job.Name, job.Namespace)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
-				if len(job.OwnerReferences) == 0 && isTargetNamespace(targetNamespaces, job.Namespace) {
+				if len(job.OwnerReferences) == 0 && isTargetNamespace(env.TargetNamespaces, job.Namespace) {
 					DeleteVPA(*client, job.Name, job.Namespace)
 				}
 			},
 		})
 	}
 
-	if resourcesToManage.Pods {
+	if env.Pods {
 		podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
-				if len(pod.OwnerReferences) == 0 && isTargetNamespace(targetNamespaces, pod.Namespace) {
+				if len(pod.OwnerReferences) == 0 && isTargetNamespace(env.TargetNamespaces, pod.Namespace) {
 					CreateVPA(*client, "Pod", pod.Name, pod.Namespace)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
-				if len(pod.OwnerReferences) == 0 && isTargetNamespace(targetNamespaces, pod.Namespace) {
+				if len(pod.OwnerReferences) == 0 && isTargetNamespace(env.TargetNamespaces, pod.Namespace) {
 					DeleteVPA(*client, pod.Name, pod.Namespace)
 				}
 			},
