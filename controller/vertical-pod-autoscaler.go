@@ -2,7 +2,7 @@ package controller
 
 import (
 	"context"
-	"log"
+	"log/slog"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -50,7 +50,12 @@ func CreateVPA(client dynamic.DynamicClient, sourceResourceType string, resource
 	}).Namespace(targetNamespace).Get(context.TODO(), resourceName, metav1.GetOptions{})
 
 	if getErr == nil {
-		log.Println("Skipping creating VPA resource as it already exists for this resource type", sourceResourceType, resourceName, targetNamespace)
+		slog.Info(
+			"Skipping creating VPA resource as it already exists for this resource type",
+			"sourceResourceType", sourceResourceType,
+			"resourceName", resourceName,
+			"targetNamespace", targetNamespace,
+		)
 	} else {
 		_, err := client.Resource(schema.GroupVersionResource{
 			Group:    "autoscaling.k8s.io",
@@ -59,9 +64,20 @@ func CreateVPA(client dynamic.DynamicClient, sourceResourceType string, resource
 		}).Namespace(targetNamespace).Create(context.TODO(), vpaTemplate, metav1.CreateOptions{})
 
 		if err != nil {
-			log.Println("Error creating vpa resource", err, sourceResourceType, resourceName, targetNamespace)
+			slog.Warn(
+				"Error creating vpa resource",
+				"error", err,
+				"sourceResourceType", sourceResourceType,
+				"resourceName", resourceName,
+				"targetNamespace", targetNamespace,
+			)
 		} else {
-			log.Println("Successfully created vpa resource", sourceResourceType, resourceName, targetNamespace)
+			slog.Info(
+				"Successfully created vpa resource",
+				"sourceResourceType", sourceResourceType,
+				"resourceName", resourceName,
+				"targetNamespace", targetNamespace,
+			)
 		}
 	}
 }
@@ -74,8 +90,17 @@ func DeleteVPA(client dynamic.DynamicClient, resourceName string, targetNamespac
 	}).Namespace(targetNamespace).Delete(context.TODO(), resourceName, metav1.DeleteOptions{})
 
 	if err != nil {
-		log.Println("Error deleting vpa resource", err, resourceName, targetNamespace)
+		slog.Warn(
+			"Error deleting vpa resource",
+			"error", err,
+			"resourceName", resourceName,
+			"targetNamespace", targetNamespace,
+		)
 	} else {
-		log.Println("Successfully deleted vpa resource", resourceName, targetNamespace)
+		slog.Info(
+			"Successfully deleted vpa resource",
+			"resourceName", resourceName,
+			"targetNamespace", targetNamespace,
+		)
 	}
 }

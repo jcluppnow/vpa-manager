@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"log"
+	"log/slog"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -31,22 +31,25 @@ func isTargetNamespace(targetNamespaces []string, namespace string) bool {
 
 func CreateInformers(env ControllerEnv) {
 	if !env.EnableCronjobs && !env.EnableDeployments && !env.EnableJobs && !env.EnablePods {
-		log.Print("All resources types are disabled, as a result no Vertical Pod Autoscalers will be created. If this is not expected, review your configuration")
+		slog.Warn("All resources types are disabled, as a result no Vertical Pod Autoscalers will be created. If this is not expected, review your configuration")
 	}
 
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		log.Fatalf("Error creating in-cluster config: %v", err)
+		slog.Error("Error creating in-cluster config")
+		panic(err)
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		log.Fatalf("Error creating Kubernetes client: %v", err)
+		slog.Error("Error creating Kubernetes client")
+		panic(err)
 	}
 
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
-		log.Fatalf("Error creating dynamic client: %v", err)
+		slog.Error("Error creating dynamic client")
+		panic(err)
 	}
 
 	factory := informers.NewSharedInformerFactory(clientset, time.Minute)

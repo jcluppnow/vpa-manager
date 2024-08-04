@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 )
@@ -9,7 +9,7 @@ import (
 func ParseBoolFromEnv(envVar string) bool {
 	value, err := strconv.ParseBool(os.Getenv(envVar))
 	if err != nil {
-		fmt.Printf("Error parsing %s from environment variables: %v\n", envVar, err)
+		slog.Error("Error parsing from environment variables", envVar, err)
 		panic(err)
 	}
 	return value
