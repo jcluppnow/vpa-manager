@@ -2,7 +2,8 @@
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 affinity: {}
 
-annotations: {}
+## Annotation values for deployment resource
+deploymentAnnotations: {}
 
 image:
   pullPolicy: IfNotPresent
@@ -13,11 +14,14 @@ image:
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
 nodeSelector: {}
 
+## Annotation values for pod resource
 podAnnotations: {}
 
 ## Assign a PriorityClassName to pods if set
 # priorityClassName: ""
 
+## Define the resources the controller container needs
+## These are not set by default as the controller will create a VPA for itself
 resources: {}
 
 # Configuration for what resources to create Vertical Pod autoscalers for
@@ -32,8 +36,8 @@ resourcesToManage:
 # Default Kubernetes value is set to 10
 revisionHistoryLimit: 10
 
-serviceAccount:
-  annotations: {}
+## Annotation values for service account resource
+serviceAccountAnnotations: {}
 
 # List of namespaces to create Vertical Pod Autoscaler resources for
 # Leaving this empty will create VPA resources for all namespaces
