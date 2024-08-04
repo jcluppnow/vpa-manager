@@ -5,9 +5,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "vpa-manager.labels" . | indent 4 }}
-  {{- if .Values.annotations }}
+  {{- if .Values.deploymentAnnotations }}
   annotations:
-    {{ toYaml .Values.annotations | indent 8 }}
+    {{ toYaml .Values.deploymentAnnotations | indent 8 }}
   {{- end }}
 spec:
   replicas: 1

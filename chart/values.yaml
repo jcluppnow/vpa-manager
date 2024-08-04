@@ -2,7 +2,7 @@
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 affinity: {}
 
-annotations: {}
+deploymentAnnotations: {}
 
 image:
   pullPolicy: IfNotPresent
@@ -32,8 +32,7 @@ resourcesToManage:
 # Default Kubernetes value is set to 10
 revisionHistoryLimit: 10
 
-serviceAccount:
-  annotations: {}
+serviceAccountAnnotations: {}
 
 # List of namespaces to create Vertical Pod Autoscaler resources for
 # Leaving this empty will create VPA resources for all namespaces
