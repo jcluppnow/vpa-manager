@@ -1,9 +1,9 @@
 package controller
 
 import (
+	"context"
 	"log/slog"
 
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -33,11 +33,16 @@ func NewController(
 	return controller
 }
 
-func (c *Controller) Run() error {
+func (c *Controller) Run(ctx context.Context) error {
 	// Start the informer factories to begin populating the informer caches
 	slog.Info("Starting ", controllerAgentName, "controller")
-	c.factory.Start(wait.NeverStop)
-	c.factory.WaitForCacheSync(wait.NeverStop)
+	c.factory.Start(ctx.Done())
+	c.factory.WaitForCacheSync(ctx.Done())
 
 	return nil
+}
+
+func (c *Controller) ShutDown(ctx context.Context) {
+	c.factory.WaitForCacheSync(ctx.Done())
+	slog.Info("Informers have been shut down")
 }

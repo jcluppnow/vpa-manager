@@ -1,7 +1,11 @@
 package main
 
 import (
+	"context"
 	"log/slog"
+	"os"
+	"os/signal"
+	"syscall"
 	"vpa-manager/controller"
 
 	"k8s.io/client-go/kubernetes"
@@ -9,6 +13,12 @@ import (
 )
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	// Handle OS signals for graceful shutdown
+	stopCh := make(chan os.Signal, 1)
+	signal.Notify(stopCh, syscall.SIGTERM, syscall.SIGINT)
+
 	env := controller.LoadEnv()
 
 	config, err := rest.InClusterConfig()
@@ -25,7 +35,11 @@ func main() {
 
 	controller := controller.NewController(env, config, clientset)
 
-	controller.Run()
+	go controller.Run(ctx)
 
-	select {}
+	// Block until a signal is received
+	<-stopCh
+	cancel() // Trigger context cancellation
+
+	controller.ShutDown(ctx)
 }
