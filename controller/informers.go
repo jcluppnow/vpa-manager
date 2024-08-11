@@ -7,7 +7,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -29,33 +28,18 @@ func isTargetNamespace(targetNamespaces []string, namespace string) bool {
 	return false
 }
 
-func CreateInformers(env ControllerEnv) {
+func CreateInformers(env ControllerEnv, config *rest.Config, clientset *kubernetes.Clientset) informers.SharedInformerFactory {
 	if !env.EnableCronjobs && !env.EnableDeployments && !env.EnableJobs && !env.EnablePods {
 		slog.Warn("All resources types are disabled, as a result no Vertical Pod Autoscalers will be created. If this is not expected, review your configuration")
 	}
 
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		slog.Error("Error creating in-cluster config")
-		panic(err)
-	}
-
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		slog.Error("Error creating Kubernetes client")
-		panic(err)
-	}
-
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
-		slog.Error("Error creating dynamic client")
+		slog.Error("Error creating dynamic client", "error", err)
 		panic(err)
 	}
 
 	factory := informers.NewSharedInformerFactory(clientset, time.Minute)
-
-	jobInformer := factory.Batch().V1().Jobs().Informer()
-	podInformer := factory.Core().V1().Pods().Informer()
 
 	if env.EnableCronjobs {
 		cronJobInformer := factory.Batch().V1().CronJobs().Informer()
@@ -85,7 +69,7 @@ func CreateInformers(env ControllerEnv) {
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				deployment := obj.(*batchv1.CronJob)
+				deployment := obj.(*appsv1.Deployment)
 				if isTargetNamespace(env.TargetNamespaces, deployment.Namespace) {
 					DeleteVPA(*client, deployment.Name, deployment.Namespace)
 				}
@@ -94,6 +78,7 @@ func CreateInformers(env ControllerEnv) {
 	}
 
 	if env.EnableJobs {
+		jobInformer := factory.Batch().V1().Jobs().Informer()
 		jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
@@ -111,6 +96,7 @@ func CreateInformers(env ControllerEnv) {
 	}
 
 	if env.EnablePods {
+		podInformer := factory.Core().V1().Pods().Informer()
 		podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
@@ -127,6 +113,5 @@ func CreateInformers(env ControllerEnv) {
 		})
 	}
 
-	factory.Start(wait.NeverStop)
-	factory.WaitForCacheSync(wait.NeverStop)
+	return factory
 }
