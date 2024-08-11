@@ -10,7 +10,25 @@ import (
 	"k8s.io/client-go/dynamic"
 )
 
-func CreateVPA(client dynamic.DynamicClient, sourceResourceType string, resourceName string, targetNamespace string) {
+func isWatchedNamespace(watchedNamespaces []string, targetNamespace string) bool {
+	if len(watchedNamespaces) == 0 {
+		return true
+	}
+
+	for index := range watchedNamespaces {
+		if watchedNamespaces[index] == targetNamespace {
+			return true
+		}
+	}
+
+	return false
+}
+
+func CreateVPA(client dynamic.DynamicClient, watchedNamespaces []string, sourceResourceType string, resourceName string, targetNamespace string) {
+	if !isWatchedNamespace(watchedNamespaces, targetNamespace) {
+		return
+	}
+
 	type ApiDetails struct {
 		version string
 		kind    string
@@ -82,7 +100,11 @@ func CreateVPA(client dynamic.DynamicClient, sourceResourceType string, resource
 	}
 }
 
-func DeleteVPA(client dynamic.DynamicClient, resourceName string, targetNamespace string) {
+func DeleteVPA(client dynamic.DynamicClient, watchedNamespaces []string, resourceName string, targetNamespace string) {
+	if !isWatchedNamespace(watchedNamespaces, targetNamespace) {
+		return
+	}
+
 	err := client.Resource(schema.GroupVersionResource{
 		Group:    "autoscaling.k8s.io",
 		Version:  "v1",
