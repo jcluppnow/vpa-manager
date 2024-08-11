@@ -35,7 +35,7 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset *kubernet
 
 	client, err := dynamic.NewForConfig(config)
 	if err != nil {
-		slog.Error("Error creating dynamic client")
+		slog.Error("Error creating dynamic client", "error", err)
 		panic(err)
 	}
 
