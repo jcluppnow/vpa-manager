@@ -69,7 +69,7 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset *kubernet
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				deployment := obj.(*batchv1.CronJob)
+				deployment := obj.(*appsv1.Deployment)
 				if isTargetNamespace(env.TargetNamespaces, deployment.Namespace) {
 					DeleteVPA(*client, deployment.Name, deployment.Namespace)
 				}
