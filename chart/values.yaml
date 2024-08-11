@@ -41,7 +41,7 @@ serviceAccountAnnotations: {}
 
 # List of namespaces to create Vertical Pod Autoscaler resources for
 # Leaving this empty will create VPA resources for all namespaces
-targetNamespaces: []
+watchedNamespaces: []
 
 
 ## Tolerations for pod assignment

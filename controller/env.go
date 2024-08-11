@@ -11,15 +11,15 @@ type ControllerEnv struct {
 	EnableDeployments bool
 	EnableJobs        bool
 	EnablePods        bool
-	TargetNamespaces  []string
+	WatchedNamespaces []string
 }
 
 func LoadEnv() ControllerEnv {
-	targetNamespaces := os.Getenv("TARGET_NAMESPACES")
+	watchedNamespaces := os.Getenv("WATCHED_NAMESPACES")
 	formattedNamespaces := []string{}
 
-	if targetNamespaces != "" {
-		formattedNamespaces = strings.Split(targetNamespaces, ",")
+	if watchedNamespaces != "" {
+		formattedNamespaces = strings.Split(watchedNamespaces, ",")
 	}
 
 	env := ControllerEnv{
@@ -27,7 +27,7 @@ func LoadEnv() ControllerEnv {
 		EnableDeployments: utils.ParseBoolFromEnv("ENABLE_DEPLOYMENTS"),
 		EnableJobs:        utils.ParseBoolFromEnv("ENABLE_JOBS"),
 		EnablePods:        utils.ParseBoolFromEnv("ENABLE_PODS"),
-		TargetNamespaces:  formattedNamespaces,
+		WatchedNamespaces: formattedNamespaces,
 	}
 
 	return env
