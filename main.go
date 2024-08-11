@@ -39,5 +39,5 @@ func main() {
 	<-stopCh
 	cancel()
 
-	controller.ShutDown(ctx)
+	slog.Info("Shutting down controller")
 }

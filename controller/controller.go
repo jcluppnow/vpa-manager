@@ -36,8 +36,3 @@ func (c *Controller) Run(ctx context.Context) error {
 
 	return nil
 }
-
-func (c *Controller) ShutDown(ctx context.Context) {
-	c.factory.WaitForCacheSync(ctx.Done())
-	slog.Info("Informers have been shut down")
-}
