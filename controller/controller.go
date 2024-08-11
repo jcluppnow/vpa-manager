@@ -9,11 +9,7 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-const controllerAgentName = "vpa-manager"
-
-// Controller is the controller implementation for Foo resources
 type Controller struct {
-	// kubeclientset is a standard kubernetes clientset
 	kubeclientset kubernetes.Interface
 	factory       informers.SharedInformerFactory
 }
@@ -34,8 +30,7 @@ func NewController(
 }
 
 func (c *Controller) Run(ctx context.Context) error {
-	// Start the informer factories to begin populating the informer caches
-	slog.Info("Starting ", controllerAgentName, "controller")
+	slog.Info("Starting controller")
 	c.factory.Start(ctx.Done())
 	c.factory.WaitForCacheSync(ctx.Done())
 

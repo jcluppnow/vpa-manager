@@ -15,7 +15,6 @@ import (
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
-	// Handle OS signals for graceful shutdown
 	stopCh := make(chan os.Signal, 1)
 	signal.Notify(stopCh, syscall.SIGTERM, syscall.SIGINT)
 
@@ -37,9 +36,8 @@ func main() {
 
 	go controller.Run(ctx)
 
-	// Block until a signal is received
 	<-stopCh
-	cancel() // Trigger context cancellation
+	cancel()
 
 	controller.ShutDown(ctx)
 }
