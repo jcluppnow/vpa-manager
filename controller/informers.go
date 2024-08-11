@@ -41,8 +41,6 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset *kubernet
 
 	factory := informers.NewSharedInformerFactory(clientset, time.Minute)
 
-	jobInformer := factory.Batch().V1().Jobs().Informer()
-	podInformer := factory.Core().V1().Pods().Informer()
 	if env.EnableCronjobs {
 		cronJobInformer := factory.Batch().V1().CronJobs().Informer()
 		cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -80,6 +78,7 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset *kubernet
 	}
 
 	if env.EnableJobs {
+		jobInformer := factory.Batch().V1().Jobs().Informer()
 		jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
@@ -97,6 +96,7 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset *kubernet
 	}
 
 	if env.EnablePods {
+		podInformer := factory.Core().V1().Pods().Informer()
 		podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
