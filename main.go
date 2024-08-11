@@ -22,13 +22,13 @@ func main() {
 
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		slog.Error("Error creating in-cluster config")
+		slog.Error("Error creating in-cluster config", "error", err)
 		panic(err)
 	}
 
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		slog.Error("Error creating Kubernetes client")
+		slog.Error("Error creating Kubernetes client", "error", err)
 		panic(err)
 	}
 
