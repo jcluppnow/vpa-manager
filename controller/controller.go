@@ -17,7 +17,7 @@ type Controller struct {
 func NewController(
 	env ControllerEnv,
 	config *rest.Config,
-	clientset *kubernetes.Clientset,
+	clientset kubernetes.Interface,
 ) *Controller {
 	slog.Info("Setting up event handlers")
 
