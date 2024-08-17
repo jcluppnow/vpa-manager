@@ -11,20 +11,16 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-var (
-	Env = ControllerEnv{
+func TestValidConfigForCreatingInformers(t *testing.T) {
+	assert := assert.New(t)
+
+	controllerEnv := ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,
 		EnablePods:        false,
 		WatchedNamespaces: []string{},
 	}
-
-	FakeClientSet = fake.NewSimpleClientset()
-)
-
-func TestValidConfigForCreatingInformers(t *testing.T) {
-	assert := assert.New(t)
 
 	config := &rest.Config{
 		Host:    "https://localhost",
@@ -39,7 +35,8 @@ func TestValidConfigForCreatingInformers(t *testing.T) {
 		UserAgent: rest.DefaultKubernetesUserAgent(),
 	}
 
-	factory := CreateInformers(Env, config, FakeClientSet)
+	fakeClientset := fake.NewSimpleClientset()
+	factory := CreateInformers(controllerEnv, config, fakeClientset)
 
 	assert.NotNil(factory, "Expected that a valid Factory instance is returned after creating informers")
 }
@@ -47,6 +44,15 @@ func TestValidConfigForCreatingInformers(t *testing.T) {
 func TestInvalidConfigForCreatingInformers(t *testing.T) {
 	assert := assert.New(t)
 	var config *rest.Config
+	fakeClientset := fake.NewSimpleClientset()
 
-	assert.Panics(func() { CreateInformers(Env, config, FakeClientSet) }, "Code path was expected to panic due to undefined rest config")
+	controllerEnv := ControllerEnv{
+		EnableCronjobs:    false,
+		EnableDeployments: true,
+		EnableJobs:        false,
+		EnablePods:        false,
+		WatchedNamespaces: []string{},
+	}
+
+	assert.Panics(func() { CreateInformers(controllerEnv, config, fakeClientset) }, "Code path was expected to panic due to undefined rest config")
 }

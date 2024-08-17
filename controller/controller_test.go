@@ -12,18 +12,16 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func newControllerEnv() ControllerEnv {
-	return ControllerEnv{
+func TestNewController(t *testing.T) {
+	assert := assert.New(t)
+
+	controllerEnv := ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,
 		EnablePods:        false,
 		WatchedNamespaces: []string{},
 	}
-}
-
-func TestNewController(t *testing.T) {
-	assert := assert.New(t)
 
 	config := &rest.Config{
 		Host:    "https://localhost",
@@ -39,14 +37,21 @@ func TestNewController(t *testing.T) {
 	}
 
 	fakeClientSet := fake.NewSimpleClientset()
-	controller := NewController(newControllerEnv(), config, fakeClientSet)
+	controller := NewController(controllerEnv, config, fakeClientSet)
 
 	assert.NotNil(controller, "Expected controller to be created correctly")
 }
 
 func TestControllerRun(t *testing.T) {
 	assert := assert.New(t)
-	fakeClientSet := fake.NewSimpleClientset()
+
+	controllerEnv := ControllerEnv{
+		EnableCronjobs:    false,
+		EnableDeployments: true,
+		EnableJobs:        false,
+		EnablePods:        false,
+		WatchedNamespaces: []string{},
+	}
 
 	config := &rest.Config{
 		Host:    "https://localhost",
@@ -61,7 +66,8 @@ func TestControllerRun(t *testing.T) {
 		UserAgent: rest.DefaultKubernetesUserAgent(),
 	}
 
-	controller := NewController(newControllerEnv(), config, fakeClientSet)
+	fakeClientSet := fake.NewSimpleClientset()
+	controller := NewController(controllerEnv, config, fakeClientSet)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	assert.NotPanics(
