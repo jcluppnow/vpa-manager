@@ -1,8 +1,9 @@
-package controller
+package events
 
 import (
 	"log/slog"
 	"time"
+	"vpa-manager/pkg/config"
 	"vpa-manager/pkg/vpa"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -15,7 +16,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernetes.Interface) informers.SharedInformerFactory {
+func CreateInformers(env config.ControllerEnv, config *rest.Config, clientset kubernetes.Interface) informers.SharedInformerFactory {
 	if !env.EnableCronjobs && !env.EnableDeployments && !env.EnableJobs && !env.EnablePods {
 		slog.Warn("All resources types are disabled, as a result no Vertical Pod Autoscalers will be created. If this is not expected, review your configuration")
 	}

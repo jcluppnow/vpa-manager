@@ -3,6 +3,8 @@ package controller
 import (
 	"context"
 	"log/slog"
+	"vpa-manager/pkg/config"
+	"vpa-manager/pkg/events"
 
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
@@ -15,19 +17,19 @@ type Controller struct {
 }
 
 func NewController(
-	env ControllerEnv,
-	config *rest.Config,
+	env config.ControllerEnv,
+	restConfig *rest.Config,
 	clientset kubernetes.Interface,
 ) *Controller {
 	slog.Info("Validating environment config")
 
-	ValidateControllerEnv(env)
+	config.ValidateControllerEnv(env)
 
 	slog.Info("Setting up event handlers")
 
 	controller := &Controller{
 		kubeclientset: clientset,
-		factory:       CreateInformers(env, config, clientset),
+		factory:       events.CreateInformers(env, restConfig, clientset),
 	}
 
 	return controller
