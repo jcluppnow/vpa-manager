@@ -24,7 +24,7 @@ func isWatchedNamespace(watchedNamespaces []string, targetNamespace string) bool
 	return false
 }
 
-func CreateVPA(client dynamic.Interface, watchedNamespaces []string, sourceResourceType string, resourceName string, targetNamespace string) {
+func CreateVPA(client dynamic.Interface, watchedNamespaces []string, sourceResourceType string, resourceName string, targetNamespace string, updateMode string) {
 	if !isWatchedNamespace(watchedNamespaces, targetNamespace) {
 		return
 	}
@@ -55,7 +55,7 @@ func CreateVPA(client dynamic.Interface, watchedNamespaces []string, sourceResou
 					"name":       resourceName,
 				},
 				"updatePolicy": map[string]interface{}{
-					"updateMode": "Off",
+					"updateMode": updateMode,
 				},
 			},
 		},

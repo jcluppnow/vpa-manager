@@ -32,7 +32,7 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernete
 		cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				cronJob := obj.(*batchv1.CronJob)
-				CreateVPA(client, env.WatchedNamespaces, "CronJob", cronJob.Name, cronJob.Namespace)
+				CreateVPA(client, env.WatchedNamespaces, "CronJob", cronJob.Name, cronJob.Namespace, env.UpdateMode)
 			},
 			DeleteFunc: func(obj interface{}) {
 				cronJob := obj.(*batchv1.CronJob)
@@ -46,7 +46,7 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernete
 		deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				deployment := obj.(*appsv1.Deployment)
-				CreateVPA(client, env.WatchedNamespaces, "Deployment", deployment.Name, deployment.Namespace)
+				CreateVPA(client, env.WatchedNamespaces, "Deployment", deployment.Name, deployment.Namespace, env.UpdateMode)
 			},
 			DeleteFunc: func(obj interface{}) {
 				deployment := obj.(*appsv1.Deployment)
@@ -61,7 +61,7 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernete
 			AddFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
 				if len(job.OwnerReferences) == 0 {
-					CreateVPA(client, env.WatchedNamespaces, "Job", job.Name, job.Namespace)
+					CreateVPA(client, env.WatchedNamespaces, "Job", job.Name, job.Namespace, env.UpdateMode)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
@@ -79,7 +79,7 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernete
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
 				if len(pod.OwnerReferences) == 0 {
-					CreateVPA(client, env.WatchedNamespaces, "Pod", pod.Name, pod.Namespace)
+					CreateVPA(client, env.WatchedNamespaces, "Pod", pod.Name, pod.Namespace, env.UpdateMode)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
