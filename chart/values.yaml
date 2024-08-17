@@ -39,11 +39,10 @@ revisionHistoryLimit: 10
 ## Annotation values for service account resource
 serviceAccountAnnotations: {}
 
-# List of namespaces to create Vertical Pod Autoscaler resources for
-# Leaving this empty will create VPA resources for all namespaces
-watchedNamespaces: []
-
-
 ## Tolerations for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
+
+# List of namespaces to create Vertical Pod Autoscaler resources for
+# Leaving this empty will create VPA resources for all namespaces
+watchedNamespaces: []
