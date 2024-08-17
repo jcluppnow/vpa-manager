@@ -20,6 +20,9 @@ func LoadEnv() ControllerEnv {
 
 	if watchedNamespaces != "" {
 		formattedNamespaces = strings.Split(watchedNamespaces, ",")
+		for i, ns := range formattedNamespaces {
+			formattedNamespaces[i] = strings.TrimSpace(ns)
+		}
 	}
 
 	env := ControllerEnv{
