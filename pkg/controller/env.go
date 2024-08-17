@@ -4,7 +4,7 @@ import (
 	"log/slog"
 	"os"
 	"strings"
-	"vpa-manager/pkg/controller/utils"
+	"vpa-manager/pkg/utils"
 )
 
 type ControllerEnv struct {

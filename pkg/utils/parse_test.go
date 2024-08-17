@@ -3,7 +3,7 @@ package utils_test
 import (
 	"os"
 	"testing"
-	"vpa-manager/pkg/controller/utils"
+	"vpa-manager/pkg/utils"
 
 	"github.com/stretchr/testify/assert"
 )
