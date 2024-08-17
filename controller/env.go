@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log/slog"
 	"os"
 	"strings"
 	"vpa-manager/controller/utils"
@@ -36,4 +37,17 @@ func LoadEnv() ControllerEnv {
 	}
 
 	return env
+}
+
+func ValidateControllerEnv(env ControllerEnv) {
+	validVPAUpdateModes := []string{"Auto", "Initial", "Recreate", "Off"}
+
+	for _, validUpdateMode := range validVPAUpdateModes {
+		if env.UpdateMode == validUpdateMode {
+			return
+		}
+	}
+
+	slog.Error("Unsupported ", "updateMode", env.UpdateMode, "supportedModes", validVPAUpdateModes)
+	panic("Unsupported update mode for controller")
 }

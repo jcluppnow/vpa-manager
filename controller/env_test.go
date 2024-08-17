@@ -67,3 +67,36 @@ func TestLoadEnvVariablesWithNamespacesDefined(t *testing.T) {
 		expected,
 	)
 }
+
+func TestValidateControllerEnvPanics(t *testing.T) {
+	assert := assert.New(t)
+
+	os.Setenv("ENABLE_CRONJOBS", "true")
+	os.Setenv("ENABLE_DEPLOYMENTS", "false")
+	os.Setenv("ENABLE_JOBS", "true")
+	os.Setenv("ENABLE_PODS", "false")
+	os.Setenv("UPDATE_MODE", "invalid-update-mode")
+	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
+
+	env := controller.LoadEnv()
+
+	assert.Panics(func() { controller.ValidateControllerEnv(env) }, "Expected validate env to panic due to invalid update mode")
+}
+
+func TestValidateControllerEnv(t *testing.T) {
+	validVPAUpdateModes := []string{"Auto", "Initial", "Recreate", "Off"}
+
+	assert := assert.New(t)
+
+	os.Setenv("ENABLE_CRONJOBS", "true")
+	os.Setenv("ENABLE_DEPLOYMENTS", "false")
+	os.Setenv("ENABLE_JOBS", "true")
+	os.Setenv("ENABLE_PODS", "false")
+	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
+
+	for _, validUpdateMode := range validVPAUpdateModes {
+		os.Setenv("UPDATE_MODE", validUpdateMode)
+		env := controller.LoadEnv()
+		assert.NotPanics(func() { controller.ValidateControllerEnv(env) }, "Expected validate env to panic due to invalid update mode")
+	}
+}

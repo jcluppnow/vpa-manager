@@ -22,6 +22,7 @@ func TestNewController(t *testing.T) {
 		EnableDeployments: true,
 		EnableJobs:        false,
 		EnablePods:        false,
+		UpdateMode:        "Off",
 		WatchedNamespaces: []string{},
 	}
 
@@ -44,6 +45,35 @@ func TestNewController(t *testing.T) {
 	assert.NotNil(controller, "Expected controller to be created correctly")
 }
 
+func TestNewControllerWithInvalidEnv(t *testing.T) {
+	assert := assert.New(t)
+
+	controllerEnv := controller.ControllerEnv{
+		EnableCronjobs:    false,
+		EnableDeployments: true,
+		EnableJobs:        false,
+		EnablePods:        false,
+		UpdateMode:        "invalid-update-mode",
+		WatchedNamespaces: []string{},
+	}
+
+	config := &rest.Config{
+		Host:    "https://localhost",
+		APIPath: "/api",
+		ContentConfig: rest.ContentConfig{
+			GroupVersion:         &v1.SchemeGroupVersion,
+			NegotiatedSerializer: scheme.Codecs,
+		},
+		Transport: &http.Transport{}, // Dummy transport
+		QPS:       10,
+		Burst:     20,
+		UserAgent: rest.DefaultKubernetesUserAgent(),
+	}
+
+	fakeClientSet := fake.NewSimpleClientset()
+	assert.Panics(func() { controller.NewController(controllerEnv, config, fakeClientSet) }, "Controller was expected to panic with invalid environment variables")
+}
+
 func TestControllerRun(t *testing.T) {
 	assert := assert.New(t)
 
@@ -52,6 +82,7 @@ func TestControllerRun(t *testing.T) {
 		EnableDeployments: true,
 		EnableJobs:        false,
 		EnablePods:        false,
+		UpdateMode:        "Off",
 		WatchedNamespaces: []string{},
 	}
 
