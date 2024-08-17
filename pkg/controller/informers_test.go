@@ -3,7 +3,7 @@ package controller_test
 import (
 	"net/http"
 	"testing"
-	"vpa-manager/controller"
+	"vpa-manager/pkg/controller"
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/networking/v1"

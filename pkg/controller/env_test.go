@@ -3,7 +3,7 @@ package controller_test
 import (
 	"os"
 	"testing"
-	"vpa-manager/controller"
+	"vpa-manager/pkg/controller"
 
 	"github.com/stretchr/testify/assert"
 )

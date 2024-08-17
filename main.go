@@ -6,7 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"vpa-manager/controller"
+	"vpa-manager/pkg/controller"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
