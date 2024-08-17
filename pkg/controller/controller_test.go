@@ -5,7 +5,8 @@ import (
 	"net/http"
 	"testing"
 
-	"vpa-manager/controller"
+	"vpa-manager/pkg/config"
+	"vpa-manager/pkg/controller"
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/networking/v1"
@@ -17,7 +18,7 @@ import (
 func TestNewController(t *testing.T) {
 	assert := assert.New(t)
 
-	controllerEnv := controller.ControllerEnv{
+	controllerEnv := config.ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,
@@ -48,7 +49,7 @@ func TestNewController(t *testing.T) {
 func TestNewControllerWithInvalidEnv(t *testing.T) {
 	assert := assert.New(t)
 
-	controllerEnv := controller.ControllerEnv{
+	controllerEnv := config.ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,
@@ -77,7 +78,7 @@ func TestNewControllerWithInvalidEnv(t *testing.T) {
 func TestControllerRun(t *testing.T) {
 	assert := assert.New(t)
 
-	controllerEnv := controller.ControllerEnv{
+	controllerEnv := config.ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,

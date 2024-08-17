@@ -1,4 +1,4 @@
-package controller_test
+package vpa_test
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"vpa-manager/controller"
+	"vpa-manager/pkg/vpa"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -40,7 +40,7 @@ func TestCreateVPAForUnwatchedNamespace(t *testing.T) {
 
 	assert := assert.New(t)
 
-	controller.CreateVPA(fakeDynamicClient, watchedNamespaces, resourceType, resourceName, targetNamespace, "Off")
+	vpa.CreateVPA(fakeDynamicClient, watchedNamespaces, resourceType, resourceName, targetNamespace, "Off")
 
 	_, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
 		Group:    "autoscaling.k8s.io",
@@ -72,7 +72,7 @@ func TestCreateVPAForWatchedNamespace(t *testing.T) {
 		for _, api := range getApiDetailsMap() {
 			var resourceName = "nginx-" + updateMode + "-" + strconv.Itoa(index)
 
-			controller.CreateVPA(fakeDynamicClient, watchedNamespaces, api.Kind, resourceName, targetNamespace, updateMode)
+			vpa.CreateVPA(fakeDynamicClient, watchedNamespaces, api.Kind, resourceName, targetNamespace, updateMode)
 
 			fetchedResource, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
 				Group:    "autoscaling.k8s.io",
@@ -118,8 +118,8 @@ func TestDeleteVPAForUnwatchedNamespace(t *testing.T) {
 
 	assert := assert.New(t)
 
-	controller.CreateVPA(fakeDynamicClient, []string{"kube-system"}, "Pod", resourceName, targetNamespace, "Off")
-	controller.DeleteVPA(fakeDynamicClient, watchedNamespaces, resourceName, targetNamespace)
+	vpa.CreateVPA(fakeDynamicClient, []string{"kube-system"}, "Pod", resourceName, targetNamespace, "Off")
+	vpa.DeleteVPA(fakeDynamicClient, watchedNamespaces, resourceName, targetNamespace)
 
 	fetchedResource, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
 		Group:    "autoscaling.k8s.io",
@@ -147,7 +147,7 @@ func TestDeleteVPAForWatchedNamespace(t *testing.T) {
 	for _, api := range getApiDetailsMap() {
 		var resourceName = "nginx-" + strconv.Itoa(index)
 
-		controller.CreateVPA(fakeDynamicClient, watchedNamespaces, api.Kind, resourceName, targetNamespace, "Off")
+		vpa.CreateVPA(fakeDynamicClient, watchedNamespaces, api.Kind, resourceName, targetNamespace, "Off")
 
 		_, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
 			Group:    "autoscaling.k8s.io",
@@ -157,7 +157,7 @@ func TestDeleteVPAForWatchedNamespace(t *testing.T) {
 
 		assert.Nil(err, "Expected VPA to be created")
 
-		controller.DeleteVPA(fakeDynamicClient, watchedNamespaces, resourceName, targetNamespace)
+		vpa.DeleteVPA(fakeDynamicClient, watchedNamespaces, resourceName, targetNamespace)
 
 		fetchedResource, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
 			Group:    "autoscaling.k8s.io",

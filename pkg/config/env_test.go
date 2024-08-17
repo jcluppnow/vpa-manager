@@ -1,9 +1,9 @@
-package controller_test
+package config_test
 
 import (
 	"os"
 	"testing"
-	"vpa-manager/controller"
+	"vpa-manager/pkg/config"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -18,9 +18,9 @@ func TestLoadEnvVariablesWithEmptyString(t *testing.T) {
 	os.Setenv("UPDATE_MODE", "Off")
 	os.Setenv("WATCHED_NAMESPACES", "")
 
-	env := controller.LoadEnv()
+	env := config.LoadEnv()
 
-	expected := controller.ControllerEnv{
+	expected := config.ControllerEnv{
 		EnableCronjobs:    true,
 		EnableDeployments: false,
 		EnableJobs:        true,
@@ -48,9 +48,9 @@ func TestLoadEnvVariablesWithNamespacesDefined(t *testing.T) {
 	os.Setenv("UPDATE_MODE", "Off")
 	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
 
-	env := controller.LoadEnv()
+	env := config.LoadEnv()
 
-	expected := controller.ControllerEnv{
+	expected := config.ControllerEnv{
 		EnableCronjobs:    true,
 		EnableDeployments: false,
 		EnableJobs:        true,
@@ -78,9 +78,9 @@ func TestValidateControllerEnvPanics(t *testing.T) {
 	os.Setenv("UPDATE_MODE", "invalid-update-mode")
 	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
 
-	env := controller.LoadEnv()
+	env := config.LoadEnv()
 
-	assert.Panics(func() { controller.ValidateControllerEnv(env) }, "Expected validate env to panic due to invalid update mode")
+	assert.Panics(func() { config.ValidateControllerEnv(env) }, "Expected validate env to panic due to invalid update mode")
 }
 
 func TestValidateControllerEnv(t *testing.T) {
@@ -96,7 +96,7 @@ func TestValidateControllerEnv(t *testing.T) {
 
 	for _, validUpdateMode := range validVPAUpdateModes {
 		os.Setenv("UPDATE_MODE", validUpdateMode)
-		env := controller.LoadEnv()
-		assert.NotPanics(func() { controller.ValidateControllerEnv(env) }, "Expected validate env to panic due to invalid update mode")
+		env := config.LoadEnv()
+		assert.NotPanics(func() { config.ValidateControllerEnv(env) }, "Expected validate env to panic due to invalid update mode")
 	}
 }

@@ -6,7 +6,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"vpa-manager/controller"
+	"vpa-manager/pkg/config"
+	"vpa-manager/pkg/controller"
 
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -18,7 +19,7 @@ func main() {
 	stopCh := make(chan os.Signal, 1)
 	signal.Notify(stopCh, syscall.SIGTERM, syscall.SIGINT)
 
-	env := controller.LoadEnv()
+	env := config.LoadEnv()
 
 	config, err := rest.InClusterConfig()
 	if err != nil {

@@ -1,8 +1,10 @@
-package controller
+package events
 
 import (
 	"log/slog"
 	"time"
+	"vpa-manager/pkg/config"
+	"vpa-manager/pkg/vpa"
 
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
@@ -14,7 +16,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernetes.Interface) informers.SharedInformerFactory {
+func CreateInformers(env config.ControllerEnv, config *rest.Config, clientset kubernetes.Interface) informers.SharedInformerFactory {
 	if !env.EnableCronjobs && !env.EnableDeployments && !env.EnableJobs && !env.EnablePods {
 		slog.Warn("All resources types are disabled, as a result no Vertical Pod Autoscalers will be created. If this is not expected, review your configuration")
 	}
@@ -32,11 +34,11 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernete
 		cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				cronJob := obj.(*batchv1.CronJob)
-				CreateVPA(client, env.WatchedNamespaces, "CronJob", cronJob.Name, cronJob.Namespace, env.UpdateMode)
+				vpa.CreateVPA(client, env.WatchedNamespaces, "CronJob", cronJob.Name, cronJob.Namespace, env.UpdateMode)
 			},
 			DeleteFunc: func(obj interface{}) {
 				cronJob := obj.(*batchv1.CronJob)
-				DeleteVPA(client, env.WatchedNamespaces, cronJob.Name, cronJob.Namespace)
+				vpa.DeleteVPA(client, env.WatchedNamespaces, cronJob.Name, cronJob.Namespace)
 			},
 		})
 	}
@@ -46,11 +48,11 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernete
 		deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				deployment := obj.(*appsv1.Deployment)
-				CreateVPA(client, env.WatchedNamespaces, "Deployment", deployment.Name, deployment.Namespace, env.UpdateMode)
+				vpa.CreateVPA(client, env.WatchedNamespaces, "Deployment", deployment.Name, deployment.Namespace, env.UpdateMode)
 			},
 			DeleteFunc: func(obj interface{}) {
 				deployment := obj.(*appsv1.Deployment)
-				DeleteVPA(client, env.WatchedNamespaces, deployment.Name, deployment.Namespace)
+				vpa.DeleteVPA(client, env.WatchedNamespaces, deployment.Name, deployment.Namespace)
 			},
 		})
 	}
@@ -61,13 +63,13 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernete
 			AddFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
 				if len(job.OwnerReferences) == 0 {
-					CreateVPA(client, env.WatchedNamespaces, "Job", job.Name, job.Namespace, env.UpdateMode)
+					vpa.CreateVPA(client, env.WatchedNamespaces, "Job", job.Name, job.Namespace, env.UpdateMode)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
 				if len(job.OwnerReferences) == 0 {
-					DeleteVPA(client, env.WatchedNamespaces, job.Name, job.Namespace)
+					vpa.DeleteVPA(client, env.WatchedNamespaces, job.Name, job.Namespace)
 				}
 			},
 		})
@@ -79,13 +81,13 @@ func CreateInformers(env ControllerEnv, config *rest.Config, clientset kubernete
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
 				if len(pod.OwnerReferences) == 0 {
-					CreateVPA(client, env.WatchedNamespaces, "Pod", pod.Name, pod.Namespace, env.UpdateMode)
+					vpa.CreateVPA(client, env.WatchedNamespaces, "Pod", pod.Name, pod.Namespace, env.UpdateMode)
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
 				if len(pod.OwnerReferences) == 0 {
-					DeleteVPA(client, env.WatchedNamespaces, pod.Name, pod.Namespace)
+					vpa.DeleteVPA(client, env.WatchedNamespaces, pod.Name, pod.Namespace)
 				}
 			},
 		})
