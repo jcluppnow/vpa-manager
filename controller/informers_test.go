@@ -1,8 +1,9 @@
-package controller
+package controller_test
 
 import (
 	"net/http"
 	"testing"
+	"vpa-manager/controller"
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/networking/v1"
@@ -14,7 +15,7 @@ import (
 func TestValidConfigForCreatingInformers(t *testing.T) {
 	assert := assert.New(t)
 
-	controllerEnv := ControllerEnv{
+	controllerEnv := controller.ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,
@@ -36,7 +37,7 @@ func TestValidConfigForCreatingInformers(t *testing.T) {
 	}
 
 	fakeClientset := fake.NewSimpleClientset()
-	factory := CreateInformers(controllerEnv, config, fakeClientset)
+	factory := controller.CreateInformers(controllerEnv, config, fakeClientset)
 
 	assert.NotNil(factory, "Expected that a valid Factory instance is returned after creating informers")
 }
@@ -46,7 +47,7 @@ func TestInvalidConfigForCreatingInformers(t *testing.T) {
 	var config *rest.Config
 	fakeClientset := fake.NewSimpleClientset()
 
-	controllerEnv := ControllerEnv{
+	controllerEnv := controller.ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,
@@ -54,5 +55,5 @@ func TestInvalidConfigForCreatingInformers(t *testing.T) {
 		WatchedNamespaces: []string{},
 	}
 
-	assert.Panics(func() { CreateInformers(controllerEnv, config, fakeClientset) }, "Code path was expected to panic due to undefined rest config")
+	assert.Panics(func() { controller.CreateInformers(controllerEnv, config, fakeClientset) }, "Code path was expected to panic due to undefined rest config")
 }

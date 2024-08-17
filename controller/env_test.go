@@ -1,8 +1,9 @@
-package controller
+package controller_test
 
 import (
 	"os"
 	"testing"
+	"vpa-manager/controller"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -16,9 +17,9 @@ func TestLoadEnvVariablesWithEmptyString(t *testing.T) {
 	os.Setenv("ENABLE_PODS", "false")
 	os.Setenv("WATCHED_NAMESPACES", "")
 
-	env := LoadEnv()
+	env := controller.LoadEnv()
 
-	expected := ControllerEnv{
+	expected := controller.ControllerEnv{
 		EnableCronjobs:    true,
 		EnableDeployments: false,
 		EnableJobs:        true,
@@ -44,9 +45,9 @@ func TestLoadEnvVariablesWithNamespacesDefined(t *testing.T) {
 	os.Setenv("ENABLE_PODS", "false")
 	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
 
-	env := LoadEnv()
+	env := controller.LoadEnv()
 
-	expected := ControllerEnv{
+	expected := controller.ControllerEnv{
 		EnableCronjobs:    true,
 		EnableDeployments: false,
 		EnableJobs:        true,

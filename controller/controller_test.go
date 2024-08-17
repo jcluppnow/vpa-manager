@@ -1,9 +1,11 @@
-package controller
+package controller_test
 
 import (
 	"context"
 	"net/http"
 	"testing"
+
+	"vpa-manager/controller"
 
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/networking/v1"
@@ -15,7 +17,7 @@ import (
 func TestNewController(t *testing.T) {
 	assert := assert.New(t)
 
-	controllerEnv := ControllerEnv{
+	controllerEnv := controller.ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,
@@ -37,7 +39,7 @@ func TestNewController(t *testing.T) {
 	}
 
 	fakeClientSet := fake.NewSimpleClientset()
-	controller := NewController(controllerEnv, config, fakeClientSet)
+	controller := controller.NewController(controllerEnv, config, fakeClientSet)
 
 	assert.NotNil(controller, "Expected controller to be created correctly")
 }
@@ -45,7 +47,7 @@ func TestNewController(t *testing.T) {
 func TestControllerRun(t *testing.T) {
 	assert := assert.New(t)
 
-	controllerEnv := ControllerEnv{
+	controllerEnv := controller.ControllerEnv{
 		EnableCronjobs:    false,
 		EnableDeployments: true,
 		EnableJobs:        false,
@@ -67,7 +69,7 @@ func TestControllerRun(t *testing.T) {
 	}
 
 	fakeClientSet := fake.NewSimpleClientset()
-	controller := NewController(controllerEnv, config, fakeClientSet)
+	controller := controller.NewController(controllerEnv, config, fakeClientSet)
 	ctx, cancel := context.WithCancel(context.Background())
 
 	assert.NotPanics(
