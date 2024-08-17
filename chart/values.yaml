@@ -43,6 +43,11 @@ serviceAccountAnnotations: {}
 ## Ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations: []
 
+## Parameter to control which mode each Vertical Pod Autoscaler resource will have
+# Options are: Auto, Recreate, Initial and Off
+## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+updateMode: "Off"
+
 # List of namespaces to create Vertical Pod Autoscaler resources for
 # Leaving this empty will create VPA resources for all namespaces
 watchedNamespaces: []
