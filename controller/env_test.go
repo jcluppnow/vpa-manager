@@ -15,6 +15,7 @@ func TestLoadEnvVariablesWithEmptyString(t *testing.T) {
 	os.Setenv("ENABLE_DEPLOYMENTS", "false")
 	os.Setenv("ENABLE_JOBS", "true")
 	os.Setenv("ENABLE_PODS", "false")
+	os.Setenv("UPDATE_MODE", "Off")
 	os.Setenv("WATCHED_NAMESPACES", "")
 
 	env := controller.LoadEnv()
@@ -24,6 +25,7 @@ func TestLoadEnvVariablesWithEmptyString(t *testing.T) {
 		EnableDeployments: false,
 		EnableJobs:        true,
 		EnablePods:        false,
+		UpdateMode:        "Off",
 		WatchedNamespaces: []string{},
 	}
 
@@ -43,6 +45,7 @@ func TestLoadEnvVariablesWithNamespacesDefined(t *testing.T) {
 	os.Setenv("ENABLE_DEPLOYMENTS", "false")
 	os.Setenv("ENABLE_JOBS", "true")
 	os.Setenv("ENABLE_PODS", "false")
+	os.Setenv("UPDATE_MODE", "Off")
 	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
 
 	env := controller.LoadEnv()
@@ -52,6 +55,7 @@ func TestLoadEnvVariablesWithNamespacesDefined(t *testing.T) {
 		EnableDeployments: false,
 		EnableJobs:        true,
 		EnablePods:        false,
+		UpdateMode:        "Off",
 		WatchedNamespaces: []string{"default", "kube-system"},
 	}
 

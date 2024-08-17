@@ -11,6 +11,7 @@ type ControllerEnv struct {
 	EnableDeployments bool
 	EnableJobs        bool
 	EnablePods        bool
+	UpdateMode        string
 	WatchedNamespaces []string
 }
 
@@ -30,6 +31,7 @@ func LoadEnv() ControllerEnv {
 		EnableDeployments: utils.ParseBoolFromEnv("ENABLE_DEPLOYMENTS"),
 		EnableJobs:        utils.ParseBoolFromEnv("ENABLE_JOBS"),
 		EnablePods:        utils.ParseBoolFromEnv("ENABLE_PODS"),
+		UpdateMode:        os.Getenv("UPDATE_MODE"),
 		WatchedNamespaces: formattedNamespaces,
 	}
 
