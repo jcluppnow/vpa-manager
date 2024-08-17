@@ -6,7 +6,9 @@ metadata:
   labels:
     {{- include "vpa-manager.labels" . | indent 4 }}
 data:
-  WATCHED_NAMESPACES: '{{ .Values.watchedNamespaces | default (list) | join "," }}'
   {{- range $name, $value := .Values.resourcesToManage }}
   ENABLE_{{ $name | upper }}: {{ $value | quote }}
   {{- end }}
+  UPDATE_MODE: '{{ .Values.updateMode | default "Off" }}'
+  WATCHED_NAMESPACES: '{{ .Values.watchedNamespaces | default (list) | join "," }}'
+

@@ -19,6 +19,10 @@ func NewController(
 	config *rest.Config,
 	clientset kubernetes.Interface,
 ) *Controller {
+	slog.Info("Validating environment config")
+
+	ValidateControllerEnv(env)
+
 	slog.Info("Setting up event handlers")
 
 	controller := &Controller{

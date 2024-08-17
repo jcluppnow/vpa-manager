@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log/slog"
 	"os"
 	"strings"
 	"vpa-manager/controller/utils"
@@ -11,6 +12,7 @@ type ControllerEnv struct {
 	EnableDeployments bool
 	EnableJobs        bool
 	EnablePods        bool
+	UpdateMode        string
 	WatchedNamespaces []string
 }
 
@@ -30,8 +32,22 @@ func LoadEnv() ControllerEnv {
 		EnableDeployments: utils.ParseBoolFromEnv("ENABLE_DEPLOYMENTS"),
 		EnableJobs:        utils.ParseBoolFromEnv("ENABLE_JOBS"),
 		EnablePods:        utils.ParseBoolFromEnv("ENABLE_PODS"),
+		UpdateMode:        os.Getenv("UPDATE_MODE"),
 		WatchedNamespaces: formattedNamespaces,
 	}
 
 	return env
+}
+
+func ValidateControllerEnv(env ControllerEnv) {
+	validVPAUpdateModes := []string{"Auto", "Initial", "Recreate", "Off"}
+
+	for _, validUpdateMode := range validVPAUpdateModes {
+		if env.UpdateMode == validUpdateMode {
+			return
+		}
+	}
+
+	slog.Error("Unsupported ", "updateMode", env.UpdateMode, "supportedModes", validVPAUpdateModes)
+	panic("Unsupported update mode for controller")
 }

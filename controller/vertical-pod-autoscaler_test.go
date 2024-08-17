@@ -40,7 +40,7 @@ func TestCreateVPAForUnwatchedNamespace(t *testing.T) {
 
 	assert := assert.New(t)
 
-	controller.CreateVPA(fakeDynamicClient, watchedNamespaces, resourceType, resourceName, targetNamespace)
+	controller.CreateVPA(fakeDynamicClient, watchedNamespaces, resourceType, resourceName, targetNamespace, "Off")
 
 	_, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
 		Group:    "autoscaling.k8s.io",
@@ -65,43 +65,47 @@ func TestCreateVPAForWatchedNamespace(t *testing.T) {
 
 	assert := assert.New(t)
 
-	var index = 0
-	for _, api := range getApiDetailsMap() {
-		var resourceName = "nginx-" + strconv.Itoa(index)
+	vpaUpdateModes := []string{"Auto", "Initial", "Recreate", "Off"}
 
-		controller.CreateVPA(fakeDynamicClient, watchedNamespaces, api.Kind, resourceName, targetNamespace)
+	for _, updateMode := range vpaUpdateModes {
+		var index = 0
+		for _, api := range getApiDetailsMap() {
+			var resourceName = "nginx-" + updateMode + "-" + strconv.Itoa(index)
 
-		fetchedResource, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
-			Group:    "autoscaling.k8s.io",
-			Version:  "v1",
-			Resource: "verticalpodautoscalers",
-		}).Namespace(targetNamespace).Get(context.TODO(), resourceName, metav1.GetOptions{})
+			controller.CreateVPA(fakeDynamicClient, watchedNamespaces, api.Kind, resourceName, targetNamespace, updateMode)
 
-		expectedResource := &unstructured.Unstructured{
-			Object: map[string]interface{}{
-				"apiVersion": "autoscaling.k8s.io/v1",
-				"kind":       "VerticalPodAutoscaler",
-				"metadata": map[string]interface{}{
-					"name":      resourceName,
-					"namespace": targetNamespace,
-				},
-				"spec": map[string]interface{}{
-					"targetRef": map[string]interface{}{
-						"apiVersion": api.Version,
-						"kind":       api.Kind,
-						"name":       resourceName,
+			fetchedResource, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
+				Group:    "autoscaling.k8s.io",
+				Version:  "v1",
+				Resource: "verticalpodautoscalers",
+			}).Namespace(targetNamespace).Get(context.TODO(), resourceName, metav1.GetOptions{})
+
+			expectedResource := &unstructured.Unstructured{
+				Object: map[string]interface{}{
+					"apiVersion": "autoscaling.k8s.io/v1",
+					"kind":       "VerticalPodAutoscaler",
+					"metadata": map[string]interface{}{
+						"name":      resourceName,
+						"namespace": targetNamespace,
 					},
-					"updatePolicy": map[string]interface{}{
-						"updateMode": "Off",
+					"spec": map[string]interface{}{
+						"targetRef": map[string]interface{}{
+							"apiVersion": api.Version,
+							"kind":       api.Kind,
+							"name":       resourceName,
+						},
+						"updatePolicy": map[string]interface{}{
+							"updateMode": updateMode,
+						},
 					},
 				},
-			},
+			}
+
+			assert.Equal(expectedResource, fetchedResource)
+			assert.Nil(err, "Error returned when creating VPA")
+
+			index++
 		}
-
-		assert.Equal(expectedResource, fetchedResource)
-		assert.Nil(err, "Error returned when creating VPA")
-
-		index++
 	}
 }
 
@@ -114,7 +118,7 @@ func TestDeleteVPAForUnwatchedNamespace(t *testing.T) {
 
 	assert := assert.New(t)
 
-	controller.CreateVPA(fakeDynamicClient, []string{"kube-system"}, "Pod", resourceName, targetNamespace)
+	controller.CreateVPA(fakeDynamicClient, []string{"kube-system"}, "Pod", resourceName, targetNamespace, "Off")
 	controller.DeleteVPA(fakeDynamicClient, watchedNamespaces, resourceName, targetNamespace)
 
 	fetchedResource, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
@@ -143,7 +147,7 @@ func TestDeleteVPAForWatchedNamespace(t *testing.T) {
 	for _, api := range getApiDetailsMap() {
 		var resourceName = "nginx-" + strconv.Itoa(index)
 
-		controller.CreateVPA(fakeDynamicClient, watchedNamespaces, api.Kind, resourceName, targetNamespace)
+		controller.CreateVPA(fakeDynamicClient, watchedNamespaces, api.Kind, resourceName, targetNamespace, "Off")
 
 		_, err := fakeDynamicClient.Resource(schema.GroupVersionResource{
 			Group:    "autoscaling.k8s.io",
