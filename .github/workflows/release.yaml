@@ -5,12 +5,10 @@ on:
     branches:
       - main
 
-job:
+jobs:
   tag:
     name: Create GitHub tag
     runs-on: ubuntu-latest
-    outputs:
-      releaseVersion: ${{ steps.tag.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
