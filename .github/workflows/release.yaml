@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+job:
+  tag:
+    name: Create GitHub tag
+    runs-on: ubuntu-latest
+    outputs:
+      releaseVersion: ${{ steps.tag.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse app version from Chart definition
+        id: parse-app-version
+        run: |
+          appVersion=$(grep '^[[:space:]]*appVersion:' ./chart/Chart.yaml | awk -F': ' '{print $2}')
+          echo "appVersion=$appVersion" >> "$GITHUB_OUTPUT"
+      
+      - name: Create tag
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v${{ steps.parse-app-version.outputs.appVersion }}"
+          git push --follow-tags
