@@ -1,6 +1,6 @@
 # Vertical Pod Autoscaler Manager
 
-VPA Manager is designed to automate the creation/deletion of VerticalPodAutoscaler (VPA) resources by monitoring the state of your workloads.
+VPA Manager is designed to automate the creation and deletion of VerticalPodAutoscaler (VPA) resources by monitoring the state of your workloads.
 VPA Manager can be configured to monitor any number of namespaces and resources.
 
 ## Usage
@@ -29,4 +29,4 @@ Chart documentation is available in `chart` directory.
 We'd love to have you contribute! Please refer to our [contribution guidelines](https://github.com/jcluppnow/vpa-manager/blob/main/CONTRIBUTING.md) for details.
 
 ## License
-VPA Manager is available under the Apache-2.0 license. See the LICENSE file for more info.
+VPA Manager is available under the Apache-2.0 license. See the [LICENSE](https://github.com/jcluppnow/vpa-manager/blob/main/LICENSE) file for more info.

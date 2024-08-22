@@ -19,10 +19,10 @@ helm install my-release jcluppnow/vpa-manager
 
 ## Uninstalling the Chart
 
-To uninstall/delete the my-release deployment:
+To uninstall the `my-release` deployment:
 
 ```console
-helm delete my-release
+helm uninstall my-release
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
