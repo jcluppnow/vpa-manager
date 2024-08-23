@@ -22,7 +22,7 @@ jobs:
         id: parse-app-version
         run: |
           appVersion=$(grep '^[[:space:]]*appVersion:' ./chart/Chart.yaml | awk -F': ' '{print $2}')
-          echo "appVersion=v$appVersion" >> "$GITHUB_OUTPUT"
+          echo "appVersion=\"v$appVersion\"" >> "$GITHUB_OUTPUT"
       
       - name: Create tag
         run: |
