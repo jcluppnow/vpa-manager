@@ -12,6 +12,8 @@ jobs:
   tag:
     name: Create GitHub tag
     runs-on: ubuntu-latest
+    outputs:
+      taggedVersion: ${{ steps.parse-app-version.outputs.appVersion }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
