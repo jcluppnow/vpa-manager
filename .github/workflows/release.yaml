@@ -49,13 +49,17 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Login to Registry
+        uses: docker/login-action@v3
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
       - name: Build and publish image to Quay
         uses: docker/build-push-action@v6
         with:
           context: .
-          username_secret: ${{ secrets.QUAY_USERNAME }}
-          password_secret: ${{ secrets.QUAY_PASSWORD }}
-          registry: quay.io
-          slug: quay.io/jcluppnow/vpa-manager
-          tags: jcluppnow/vpa-manager:latest,jcluppnow/vpa-manager:${{ needs.tag.outputs.taggedVersion }}
-          type: remote
+          platforms: linux/amd64,linux/arm64,darwin/amd64,darwin/arm64
+          push: true
+          tags: quay.io/jcluppnow/vpa-manager:latest,quay.io/jcluppnow/vpa-manager:${{ needs.tag.outputs.taggedVersion }}
