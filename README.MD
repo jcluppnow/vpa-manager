@@ -1,4 +1,5 @@
 # Vertical Pod Autoscaler Manager
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/jcluppnow/vpa-manager/release.yaml)
 
 VPA Manager is designed to automate the creation and deletion of VerticalPodAutoscaler (VPA) resources by monitoring the state of your workloads.
 VPA Manager can be configured to monitor any number of namespaces and resources.
