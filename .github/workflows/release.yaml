@@ -21,7 +21,7 @@ jobs:
       - name: Parse app version from Chart definition
         id: parse-app-version
         run: |
-          appVersion=$(grep '^[[:space:]]*appVersion:' ./chart/Chart.yaml | awk -F': ' '{print $2}')
+          appVersion=$(grep '^[[:space:]]*appVersion:' ./chart/Chart.yaml | awk -F': ' '{print $2}' | sed 's/^"\(.*\)"$/\1/')
           echo "appVersion=$appVersion" >> "$GITHUB_OUTPUT"
       
       - name: Create tag
