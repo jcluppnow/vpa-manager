@@ -22,7 +22,7 @@ jobs:
         id: parse-app-version
         run: |
           appVersion=$(grep '^[[:space:]]*appVersion:' ./chart/Chart.yaml | awk -F': ' '{print $2}')
-          echo "appVersion=\"v$appVersion\"" >> "$GITHUB_OUTPUT"
+          echo "appVersion=$appVersion" >> "$GITHUB_OUTPUT"
       
       - name: Create tag
         run: |
@@ -41,7 +41,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ needs.tag.outputs.taggedVersion }}
+          ref: "v${{ needs.tag.outputs.taggedVersion }}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
