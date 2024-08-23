@@ -13,7 +13,7 @@ jobs:
     name: Create GitHub tag
     runs-on: ubuntu-latest
     outputs:
-      taggedVersion: "v${{ steps.parse-app-version.outputs.appVersion }}"
+      taggedVersion: ${{ steps.parse-app-version.outputs.appVersion }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,8 +29,8 @@ jobs:
           appVersion=${{ steps.parse-app-version.outputs.appVersion }}
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "v$appVersion"
-          git push origin "v$appVersion"
+          git tag $appVersion
+          git push origin $appVersion
 
   build-and-publish:
     name: Build and publish image
