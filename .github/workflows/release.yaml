@@ -63,3 +63,27 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: quay.io/jcluppnow/vpa-manager:latest,quay.io/jcluppnow/vpa-manager:${{ needs.tag.outputs.taggedVersion }}
+  
+  release-chart:
+    name: Release Helm Chart
+    runs-on: ubuntu-latest
+    needs: [tag, build-and-publish]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.tag.outputs.taggedVersion }}
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        with:
+          charts_dir: ./chart
+          skip_existing: true
