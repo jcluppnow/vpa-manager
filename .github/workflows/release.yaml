@@ -80,18 +80,8 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Package Helm Chart
-        run: helm package ./chart --destination ./chart-package
-      
-      - name: Create Helm Repo Index
-        run: helm repo index ./chart-package --url https://jcluppnow.github.io/vpa-manager
-      
-      - name: Copy README to be published alongisde Helm chart
-        run:  cp ./chart/README.MD ./chart-package
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          enable_jekyll: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./chart-package
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CHARTS_DIR: "./chart"
