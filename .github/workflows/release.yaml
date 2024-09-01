@@ -10,16 +10,16 @@ permissions:
 
 jobs:
   tag:
-    uses: .github/workflows/tag.yaml
+    uses: ./.github/workflows/tag.yaml
 
   build-and-publish:
     needs: tag
-    uses: ./github/workflows/build-and-publish-image.yaml
+    uses: ./.github/workflows/build-and-publish-image.yaml
     with:
       tagged_version: ${{ needs.tag.outputs.taggedVersion }}
   
   package-and-publish-chart:
     needs: tag
-    uses: ./github/workflows/package-and-publish-chart.yaml
+    uses: ./.github/workflows/package-and-publish-chart.yaml
     with:
       tagged_version: ${{ needs.tag.outputs.taggedVersion }}
