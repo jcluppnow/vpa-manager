@@ -1,0 +1,33 @@
+on:
+  workflow_call:
+    outputs:
+      taggedVersion:
+        description: "Tag created for the latest release"
+        value: ${{ jobs.tag.outputs.taggedVersion }}
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    name: Create GitHub tag
+    runs-on: ubuntu-latest
+    outputs:
+      taggedVersion: ${{ steps.parse-app-version.outputs.appVersion }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse app version from Chart definition
+        id: parse-app-version
+        run: |
+          appVersion=$(grep '^[[:space:]]*appVersion:' ./chart/Chart.yaml | awk -F': ' '{print $2}' | sed 's/^"\(.*\)"$/\1/')
+          echo "appVersion=$appVersion" >> "$GITHUB_OUTPUT"
+      
+      - name: Create tag
+        run: |
+          appVersion=${{ steps.parse-app-version.outputs.appVersion }}
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git tag $appVersion
+          git push origin $appVersion
