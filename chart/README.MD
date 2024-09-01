@@ -3,7 +3,7 @@
 ## Get Repo Info
 
 ```console
-helm repo add jcluppnow https://jcluppnow.github.io/chart
+helm repo add jcluppnow https://jcluppnow.github.io/vpa-manager
 helm repo update
 ```
 
