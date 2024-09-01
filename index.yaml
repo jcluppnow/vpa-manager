@@ -2,15 +2,15 @@ apiVersion: v1
 entries:
   vpa-manager:
   - apiVersion: v1
-    appVersion: 0.5.6
-    created: "2024-09-01T10:29:55.988020156Z"
+    appVersion: 0.5.7
+    created: "2024-09-01T10:55:59.173858847Z"
     description: A tool to automate the creation of Vertical Pod Autoscaler resources
-    digest: 8c8dce5c7a552c64d488d0c4643ca268a86a5e1be1bfd380c7f89e806d336fad
+    digest: 38e7b8948e2a9522efff08fd638024c3492dec5f5408d143e5ef7ea93f9d6c6d
     home: https://github.com/jcluppnow/vpa-manager
     keywords:
     - autoscaling
     name: vpa-manager
     urls:
-    - https://jcluppnow.github.io/vpa-manager/vpa-manager-0.3.5.tgz
-    version: 0.3.5
-generated: "2024-09-01T10:29:55.987606753Z"
+    - https://jcluppnow.github.io/vpa-manager/vpa-manager-0.3.6.tgz
+    version: 0.3.6
+generated: "2024-09-01T10:55:59.17346576Z"
