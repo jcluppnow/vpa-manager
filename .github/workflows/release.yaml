@@ -14,10 +14,11 @@ jobs:
 
   build-and-publish:
     needs: tag
+    secrets: inherit
     uses: ./.github/workflows/build-and-publish-image.yaml
     with:
       tagged_version: ${{ needs.tag.outputs.taggedVersion }}
-  
+
   package-and-publish-chart:
     needs: tag
     uses: ./.github/workflows/package-and-publish-chart.yaml
