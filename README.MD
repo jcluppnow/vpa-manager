@@ -10,7 +10,7 @@ VPA Manager can be configured to monitor any number of namespaces and resources.
 Once Helm is set up properly, add the repo as follows:
 
 ```console
-helm repo add jcluppnow https://jcluppnow.github.io/helm-charts
+helm repo add jcluppnow https://jcluppnow.github.io/vpa-manager
 helm repo update
 ```
 
@@ -26,7 +26,6 @@ Chart documentation is available in `chart` directory.
 
 ## Contributing
 
-<!-- Keep full URL links to repo files because this README syncs from main to gh-pages.  -->
 We'd love to have you contribute! Please refer to our [contribution guidelines](https://github.com/jcluppnow/vpa-manager/blob/main/CONTRIBUTING.md) for details.
 
 ## License
