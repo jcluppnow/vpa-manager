@@ -86,7 +86,7 @@ jobs:
         run: helm repo index ./chart-package --url https://jcluppnow.github.io/vpa-manager
 
       - name: Copy README to be published alongisde Helm chart
-        run:  cp ./chart/README.MD ./chart-package
+        run:  cp ./chart/index.md ./chart-package
 
       - name: List files in chart-package directory
         run: ls -la ./chart-package
