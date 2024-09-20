@@ -31,7 +31,7 @@ func CreateInformers(env config.ControllerEnv, config *rest.Config, clientset ku
 
 	if env.EnableCronjobs {
 		cronJobInformer := factory.Batch().V1().CronJobs().Informer()
-		cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		_, err = cronJobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				cronJob := obj.(*batchv1.CronJob)
 				vpa.CreateVPA(client, env.WatchedNamespaces, "CronJob", cronJob.Name, cronJob.Namespace, env.UpdateMode)
@@ -41,11 +41,16 @@ func CreateInformers(env config.ControllerEnv, config *rest.Config, clientset ku
 				vpa.DeleteVPA(client, env.WatchedNamespaces, cronJob.Name, cronJob.Namespace)
 			},
 		})
+
+		if err != nil {
+			slog.Error("Error creating CronJob informer", "error", err)
+			panic(err)
+		}
 	}
 
 	if env.EnableDeployments {
 		deploymentInformer := factory.Apps().V1().Deployments().Informer()
-		deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		_, err = deploymentInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				deployment := obj.(*appsv1.Deployment)
 				vpa.CreateVPA(client, env.WatchedNamespaces, "Deployment", deployment.Name, deployment.Namespace, env.UpdateMode)
@@ -55,11 +60,16 @@ func CreateInformers(env config.ControllerEnv, config *rest.Config, clientset ku
 				vpa.DeleteVPA(client, env.WatchedNamespaces, deployment.Name, deployment.Namespace)
 			},
 		})
+
+		if err != nil {
+			slog.Error("Error creating Deployment informer", "error", err)
+			panic(err)
+		}
 	}
 
 	if env.EnableJobs {
 		jobInformer := factory.Batch().V1().Jobs().Informer()
-		jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		_, err = jobInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				job := obj.(*batchv1.Job)
 				if len(job.OwnerReferences) == 0 {
@@ -73,11 +83,16 @@ func CreateInformers(env config.ControllerEnv, config *rest.Config, clientset ku
 				}
 			},
 		})
+
+		if err != nil {
+			slog.Error("Error creating Job informer", "error", err)
+			panic(err)
+		}
 	}
 
 	if env.EnablePods {
 		podInformer := factory.Core().V1().Pods().Informer()
-		podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		_, err = podInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				pod := obj.(*v1.Pod)
 				if len(pod.OwnerReferences) == 0 {
@@ -91,6 +106,11 @@ func CreateInformers(env config.ControllerEnv, config *rest.Config, clientset ku
 				}
 			},
 		})
+
+		if err != nil {
+			slog.Error("Error creating Pod informer", "error", err)
+			panic(err)
+		}
 	}
 
 	return factory

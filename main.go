@@ -35,7 +35,10 @@ func main() {
 
 	controller := controller.NewController(env, config, clientset)
 
-	go controller.Run(ctx)
+	if err := controller.Run(ctx); err != nil {
+		slog.Error("Error running controller", "error", err)
+		panic(err)
+	}
 
 	<-stopCh
 	cancel()
