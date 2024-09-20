@@ -10,7 +10,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
       
@@ -23,6 +22,27 @@ jobs:
           context: .
           platforms: linux/amd64,linux/arm64,darwin/amd64,darwin/arm64
           tags: quay.io/jcluppnow/vpa-manager:latest
+
+  lint:
+    strategy:
+      matrix:
+        go: [stable]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    name: Lint
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Lint Go files
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.60
 
   test:
     runs-on: ubuntu-latest
@@ -37,7 +57,7 @@ jobs:
   # This job must pass to merge a PR, allows us to add and remove PR checks as required.
   required:
     name: PR Checks Completed
-    needs: [build, test]
+    needs: [build, lint, test]
     runs-on: ubuntu-latest
     steps:
       - run: echo "PR Checks Completed"
