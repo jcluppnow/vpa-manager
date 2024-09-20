@@ -8,7 +8,7 @@ deploymentAnnotations: {}
 image:
   pullPolicy: IfNotPresent
   repository: "quay.io/jcluppnow/vpa-manager"
-  tag: "0.6.0" 
+  tag: "0.6.4" 
 
 ## Node labels for pod assignment
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
