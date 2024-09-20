@@ -33,3 +33,11 @@ jobs:
           go-version: '1.22'
       - name: Run Tests
         run: go test -v ./...
+
+  # This job must pass to merge a PR, allows us to add and remove PR checks as required.
+  required:
+    name: PR Checks Completed
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "PR Checks Completed"
