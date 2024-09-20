@@ -1,6 +1,29 @@
 name: PR checks
+
 on: [pull_request]
+
 jobs:
+  build:
+    name: Build and publish image
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+
+        - name: Set up QEMU
+          uses: docker/setup-qemu-action@v3
+        
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
+
+        - name: Build and publish image to Quay
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            platforms: linux/amd64,linux/arm64,darwin/amd64,darwin/arm64
+            tags: quay.io/jcluppnow/vpa-manager:latest
+
   test:
     runs-on: ubuntu-latest
     steps:
