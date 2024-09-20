@@ -20,7 +20,7 @@ jobs:
       tagged_version: ${{ needs.tag.outputs.taggedVersion }}
 
   package-and-publish-chart:
-    needs: tag
+    needs: [tag, build-and-publish]
     uses: ./.github/workflows/package-and-publish-chart.yaml
     with:
       tagged_version: ${{ needs.tag.outputs.taggedVersion }}
