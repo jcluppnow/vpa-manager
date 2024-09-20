@@ -24,6 +24,7 @@ jobs:
           tags: quay.io/jcluppnow/vpa-manager:latest
 
   lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,6 +41,7 @@ jobs:
           version: v1.60
 
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
