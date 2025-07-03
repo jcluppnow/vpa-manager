@@ -1,7 +1,8 @@
 module vpa-manager
 
-go 1.22.4
-toolchain go1.23.7
+go 1.23.0
+
+toolchain go1.24.4
 
 require (
 	github.com/stretchr/testify v1.9.0
