@@ -27,6 +27,12 @@ helm install my-release jcluppnow/vpa-manager
 
 Chart documentation is available in `chart` directory.
 
+## Running Tests
+Run the following command from the root directory
+```console
+./testing/test.sh
+```
+
 ## Contributing
 
 We'd love to have you contribute! Please refer to our [contribution guidelines](https://github.com/jcluppnow/vpa-manager/blob/main/CONTRIBUTING.md) for details.
