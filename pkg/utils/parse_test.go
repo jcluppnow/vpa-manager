@@ -15,7 +15,7 @@ func TestParseBoolWithValidParam(t *testing.T) {
 	varValues := []string{"TRUE", "true", "True"}
 
 	for _, envVarValue := range varValues {
-		os.Setenv(envVar, envVarValue)
+		_ = os.Setenv(envVar, envVarValue)
 		parsedValue := utils.ParseBoolFromEnv(envVar)
 		assert.Equal(parsedValue, true, "Parse Bool from Env failed for value: %s", envVarValue)
 	}
@@ -27,7 +27,7 @@ func TestParseBoolWithInvalidValues(t *testing.T) {
 	varValues := []string{"", "invalid_bool"}
 
 	for _, envVarValue := range varValues {
-		os.Setenv(envVar, envVarValue)
+		_ = os.Setenv(envVar, envVarValue)
 		assert.Panics(func() { utils.ParseBoolFromEnv(envVar) }, "Code path was expected to panic")
 	}
 }

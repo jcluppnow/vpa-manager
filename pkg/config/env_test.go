@@ -11,12 +11,12 @@ import (
 func TestLoadEnvVariablesWithEmptyString(t *testing.T) {
 	assert := assert.New(t)
 
-	os.Setenv("ENABLE_CRONJOBS", "true")
-	os.Setenv("ENABLE_DEPLOYMENTS", "false")
-	os.Setenv("ENABLE_JOBS", "true")
-	os.Setenv("ENABLE_PODS", "false")
-	os.Setenv("UPDATE_MODE", "Off")
-	os.Setenv("WATCHED_NAMESPACES", "")
+	_ = os.Setenv("ENABLE_CRONJOBS", "true")
+	_ = os.Setenv("ENABLE_DEPLOYMENTS", "false")
+	_ = os.Setenv("ENABLE_JOBS", "true")
+	_ = os.Setenv("ENABLE_PODS", "false")
+	_ = os.Setenv("UPDATE_MODE", "Off")
+	_ = os.Setenv("WATCHED_NAMESPACES", "")
 
 	env := config.LoadEnv()
 
@@ -41,12 +41,12 @@ func TestLoadEnvVariablesWithEmptyString(t *testing.T) {
 func TestLoadEnvVariablesWithNamespacesDefined(t *testing.T) {
 	assert := assert.New(t)
 
-	os.Setenv("ENABLE_CRONJOBS", "true")
-	os.Setenv("ENABLE_DEPLOYMENTS", "false")
-	os.Setenv("ENABLE_JOBS", "true")
-	os.Setenv("ENABLE_PODS", "false")
-	os.Setenv("UPDATE_MODE", "Off")
-	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
+	_ = os.Setenv("ENABLE_CRONJOBS", "true")
+	_ = os.Setenv("ENABLE_DEPLOYMENTS", "false")
+	_ = os.Setenv("ENABLE_JOBS", "true")
+	_ = os.Setenv("ENABLE_PODS", "false")
+	_ = os.Setenv("UPDATE_MODE", "Off")
+	_ = os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
 
 	env := config.LoadEnv()
 
@@ -71,12 +71,12 @@ func TestLoadEnvVariablesWithNamespacesDefined(t *testing.T) {
 func TestValidateControllerEnvPanics(t *testing.T) {
 	assert := assert.New(t)
 
-	os.Setenv("ENABLE_CRONJOBS", "true")
-	os.Setenv("ENABLE_DEPLOYMENTS", "false")
-	os.Setenv("ENABLE_JOBS", "true")
-	os.Setenv("ENABLE_PODS", "false")
-	os.Setenv("UPDATE_MODE", "invalid-update-mode")
-	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
+	_ = os.Setenv("ENABLE_CRONJOBS", "true")
+	_ = os.Setenv("ENABLE_DEPLOYMENTS", "false")
+	_ = os.Setenv("ENABLE_JOBS", "true")
+	_ = os.Setenv("ENABLE_PODS", "false")
+	_ = os.Setenv("UPDATE_MODE", "invalid-update-mode")
+	_ = os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
 
 	env := config.LoadEnv()
 
@@ -88,14 +88,14 @@ func TestValidateControllerEnv(t *testing.T) {
 
 	assert := assert.New(t)
 
-	os.Setenv("ENABLE_CRONJOBS", "true")
-	os.Setenv("ENABLE_DEPLOYMENTS", "false")
-	os.Setenv("ENABLE_JOBS", "true")
-	os.Setenv("ENABLE_PODS", "false")
-	os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
+	_ = os.Setenv("ENABLE_CRONJOBS", "true")
+	_ = os.Setenv("ENABLE_DEPLOYMENTS", "false")
+	_ = os.Setenv("ENABLE_JOBS", "true")
+	_ = os.Setenv("ENABLE_PODS", "false")
+	_ = os.Setenv("WATCHED_NAMESPACES", "default, kube-system")
 
 	for _, validUpdateMode := range validVPAUpdateModes {
-		os.Setenv("UPDATE_MODE", validUpdateMode)
+		_ = os.Setenv("UPDATE_MODE", validUpdateMode)
 		env := config.LoadEnv()
 		assert.NotPanics(func() { config.ValidateControllerEnv(env) }, "Expected validate env to panic due to invalid update mode")
 	}
